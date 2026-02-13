@@ -3,63 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis</title>
+<title>Ateliê Patrícia Reis - Orçamento</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#ffffff;
-    margin:0;
-    padding:20px;
+font-family: Arial, sans-serif;
+background:#ffffff;
+margin:0;
+padding:20px;
 }
+
 .container{
-    max-width:500px;
-    margin:auto;
+max-width:520px;
+margin:auto;
 }
+
 h1{
-    text-align:center;
-    color:#4A6FA5;
+text-align:center;
+color:#4A6FA5;
 }
+
 input, select{
-    width:100%;
-    padding:12px;
-    margin:6px 0 15px 0;
-    border-radius:8px;
-    border:1px solid #ccc;
-    font-size:16px;
+width:100%;
+padding:10px;
+margin:6px 0 14px 0;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:16px;
 }
+
 button{
-    width:100%;
-    padding:14px;
-    background:#4A6FA5;
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
+width:100%;
+padding:14px;
+background:#4A6FA5;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+margin-top:10px;
 }
+
 .result{
-    margin-top:20px;
-    padding:15px;
-    background:#f3f6fb;
-    border-radius:10px;
-    font-size:15px;
-}
-@media print{
-    button{
-        display:none;
-    }
+margin-top:20px;
+padding:15px;
+background:#f3f6fb;
+border-radius:10px;
+font-size:15px;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <h1>Orçamento</h1>
-
-<label>Nome do Cliente</label>
-<input type="text" id="cliente">
 
 <label>Largura (m)</label>
 <input type="number" id="largura" step="0.01">
@@ -78,55 +75,143 @@ button{
 <label>Tipo</label>
 <select id="tipo">
 <option value="sem">Sem Forro</option>
-<option value="com">Com Forro</option>
+<option value="micro">Microfibra</option>
+<option value="70">Blackout 70%</option>
+<option value="100">Blackout 100%</option>
 </select>
 
-<label>Valor Metro Linear Sem Forro</label>
-<input type="number" id="mlSem" value="150">
+<label>Valor metro linear SEM forro</label>
+<input type="number" id="valorSem" value="150">
 
-<label>Valor Metro Linear Com Forro</label>
-<input type="number" id="mlCom" value="200">
+<label>Valor metro linear COM forro</label>
+<input type="number" id="valorCom" value="200">
 
-<label>Lucro Desejado (R$)</label>
-<input type="number" id="lucro">
+<label>Valor instalação (opcional)</label>
+<input type="number" id="instalacao" value="0">
+
+<label>Desconto (R$)</label>
+<input type="number" id="desconto" value="0">
 
 <button onclick="calcular()">Calcular</button>
 
 <div class="result" id="resultado"></div>
 
-<button onclick="window.print()">Gerar PDF</button>
-
 </div>
 
 <script>
+
 function calcular(){
 
-let largura = parseFloat(document.getElementById('largura').value) || 0;
-let tipo = document.getElementById('tipo').value;
-let mlSem = parseFloat(document.getElementById('mlSem').value) || 0;
-let mlCom = parseFloat(document.getElementById('mlCom').value) || 0;
-let lucro = parseFloat(document.getElementById('lucro').value) || 0;
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let tipo = document.getElementById("tipo").value;
+let valorSem = parseFloat(document.getElementById("valorSem").value);
+let valorCom = parseFloat(document.getElementById("valorCom").value);
+let instalacao = parseFloat(document.getElementById("instalacao").value);
+let desconto = parseFloat(document.getElementById("desconto").value);
 
-let consumo = (largura * 3.5) / 3;
-let rodizios = Math.round((largura * 100) / 10);
+if(!largura || !altura){
+alert("Preencha largura e altura");
+return;
+}
+
+/* =======================
+CÁLCULO GAZE
+largura x 3.5 / 3 = quantidade de alturas
+======================= */
+
+let alturas = Math.ceil((largura * 3.5) / 3);
+
+let barraExtra = 0.32; 
+let alturaFinal = altura + 0.12 + barraExtra;
+
+let metrosGaze = alturas * alturaFinal;
+
+/* =======================
+FORRO / BLACKOUT
+largura x2
+======================= */
+
+let metrosForro = 0;
+
+if(tipo !== "sem"){
+let alturasForro = Math.ceil((largura * 2) / 3);
+metrosForro = alturasForro * alturaFinal;
+}
+
+/* =======================
+RODÍZIO
+1 a cada 10cm
+======================= */
+
+let rodizios = Math.ceil((largura * 100) / 10);
+
+/* =======================
+TRILHO
+mesma largura
+======================= */
+
 let trilho = largura * 16;
 
-let valorMetro = tipo === "sem" ? mlSem : mlCom;
-let confeccao = largura * valorMetro;
+/* =======================
+CUSTOS FIXOS
+======================= */
 
-let custoBase = confeccao + trilho;
-let valorFinal = custoBase + lucro;
+let custoGaze = metrosGaze * 27;
+let custoMicro = metrosForro * 15;
+let custo70 = metrosForro * 25;
+let custo100 = metrosForro * 33;
 
-document.getElementById("resultado").innerHTML =
-"<strong>Consumo de Tecido:</strong> " + consumo.toFixed(2) + " m<br>" +
-"<strong>Rodízios:</strong> " + rodizios + " un<br>" +
-"<strong>Trilho:</strong> R$ " + trilho.toFixed(2) + "<br>" +
-"<strong>Confecção:</strong> R$ " + confeccao.toFixed(2) + "<br><br>" +
-"<strong>Custo Base:</strong> R$ " + custoBase.toFixed(2) + "<br>" +
-"<strong>Lucro:</strong> R$ " + lucro.toFixed(2) + "<br><br>" +
-"<strong style='font-size:18px;'>VALOR FINAL:</strong> R$ " + valorFinal.toFixed(2);
+let custoForro = 0;
+
+if(tipo === "micro") custoForro = custoMicro;
+if(tipo === "70") custoForro = custo70;
+if(tipo === "100") custoForro = custo100;
+
+/* =======================
+MÃO DE OBRA
+======================= */
+
+let maoObra = 0;
+
+if(tipo === "sem"){
+maoObra = largura * valorSem;
+}else{
+maoObra = largura * valorCom;
+}
+
+/* =======================
+CUSTO TOTAL
+======================= */
+
+let custoTotal = custoGaze + custoForro + trilho + maoObra + instalacao - desconto;
+
+/* =======================
+LUCRO REAL
+======================= */
+
+let lucro = custoTotal - (custoGaze + custoForro + trilho);
+
+/* =======================
+RESULTADO
+======================= */
+
+document.getElementById("resultado").innerHTML = `
+<b>Alturas necessárias:</b> ${alturas} un<br>
+<b>Consumo Gaze:</b> ${metrosGaze.toFixed(2)} m<br>
+<b>Consumo Forro:</b> ${metrosForro.toFixed(2)} m<br>
+<b>Rodízios:</b> ${rodizios} un<br>
+<b>Trilho:</b> R$ ${trilho.toFixed(2)}<br>
+<b>Confecção:</b> R$ ${maoObra.toFixed(2)}<br>
+<br>
+<b>CUSTO BASE:</b> R$ ${custoTotal.toFixed(2)}<br>
+<b>Lucro:</b> R$ ${lucro.toFixed(2)}<br>
+<br>
+<h2>VALOR FINAL: R$ ${custoTotal.toFixed(2)}</h2>
+`;
 
 }
+
 </script>
 
 </body>
