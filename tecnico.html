@@ -61,42 +61,34 @@ let valorRodizio = 0.12;
 let valorPresilha = 1.60;
 let valorTrilho = 15;
 
-// FRANZIMENTO
-let fator = (forro === "sem") ? 3.5 : 2;
-
-// ALTURAS
-let alturas = Math.ceil((largura * fator) / 3);
-
-// ALTURA REAL
+// ALTURA REAL (12cm + barra 32cm = 0.44)
 let alturaReal = altura + 0.44;
 
-// CONSUMO GAZE
-let metragemGaze = alturas * alturaReal;
+// ===== GAZE =====
+let alturasGaze = Math.ceil((largura * 3.5) / 3);
+let metragemGaze = alturasGaze * alturaReal;
 
-// CONSUMO FORRO
+// ===== FORRO =====
+let alturasForro = 0;
 let metragemForro = 0;
 let valorForroMetro = 0;
 
-if(forro === "micro"){
-    metragemForro = alturas * alturaReal;
-    valorForroMetro = valorMicro;
-}
-if(forro === "70"){
-    metragemForro = alturas * alturaReal;
-    valorForroMetro = valor70;
-}
-if(forro === "100"){
-    metragemForro = alturas * alturaReal;
-    valorForroMetro = valor100;
+if(forro !== "sem"){
+    alturasForro = Math.ceil((largura * 2) / 3);
+    metragemForro = alturasForro * alturaReal;
+
+    if(forro === "micro"){ valorForroMetro = valorMicro; }
+    if(forro === "70"){ valorForroMetro = valor70; }
+    if(forro === "100"){ valorForroMetro = valor100; }
 }
 
-// RODÍZIOS
+// ===== RODÍZIOS =====
 let rodizios = Math.ceil((largura * 100) / 10);
 if(forro !== "sem"){
     rodizios = rodizios * 2;
 }
 
-// CUSTOS
+// ===== CUSTOS =====
 let custoGaze = metragemGaze * valorGaze;
 let custoForro = metragemForro * valorForroMetro;
 let custoEntretela = metragemGaze * valorEntretela;
@@ -106,26 +98,30 @@ let custoTrilho = largura * valorTrilho;
 
 let custoTecnico = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
 
-// VALOR VENDA
+// ===== VALOR VENDA =====
 let valorVenda = (forro === "sem") ? largura*150 : largura*200;
-
 let valorFinal = valorVenda + instalacao - desconto;
 
 let lucro = valorVenda - custoTecnico;
 
 document.getElementById("resultado").innerHTML = `
-Alturas necessárias: ${alturas} <br>
-Metragem Gaze: ${metragemGaze.toFixed(2)} m <br>
-Metragem Forro: ${metragemForro.toFixed(2)} m <br>
-Rodízios: ${rodizios} <br>
-<br>
+<b>GAZE</b><br>
+Alturas: ${alturasGaze} <br>
+Metragem: ${metragemGaze.toFixed(2)} m<br><br>
+
+<b>FORRO</b><br>
+Alturas: ${alturasForro} <br>
+Metragem: ${metragemForro.toFixed(2)} m<br><br>
+
+Rodízios: ${rodizios} <br><br>
+
 Custo Gaze: R$ ${custoGaze.toFixed(2)} <br>
 Custo Forro: R$ ${custoForro.toFixed(2)} <br>
 Custo Entretela: R$ ${custoEntretela.toFixed(2)} <br>
 Custo Rodízio: R$ ${custoRodizio.toFixed(2)} <br>
 Custo Presilha: R$ ${custoPresilha.toFixed(2)} <br>
-Custo Trilho: R$ ${custoTrilho.toFixed(2)} <br>
-<br>
+Custo Trilho: R$ ${custoTrilho.toFixed(2)} <br><br>
+
 <b>CUSTO TÉCNICO: R$ ${custoTecnico.toFixed(2)}</b> <br>
 <b>LUCRO: R$ ${lucro.toFixed(2)}</b> <br>
 <div class="final">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</div>
