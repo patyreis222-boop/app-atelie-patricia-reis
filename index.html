@@ -13,7 +13,7 @@ body{
     padding:20px;
 }
 .container{
-    max-width:700px;
+    max-width:750px;
     margin:auto;
 }
 .logo{
@@ -96,13 +96,13 @@ button{
 <!-- TÉCNICO -->
 <div id="tecnico" class="section active">
 
-<label>Largura da cortina (m)</label>
+<label>Largura (m)</label>
 <input id="largura" type="number" step="0.01">
 
-<label>Altura da cortina (m)</label>
+<label>Altura (m)</label>
 <input id="altura" type="number" step="0.01">
 
-<label>Tamanho da Barra (m)</label>
+<label>Barra (m)</label>
 <input id="barra" type="number" step="0.01" placeholder="Ex: 0.32">
 
 <label>Modelo</label>
@@ -145,7 +145,7 @@ button{
 <input id="cliente">
 
 <label>Condições de pagamento</label>
-<input id="pagamento" placeholder="Ex: 50% entrada / 50% entrega">
+<input id="pagamento">
 
 <button onclick="gerarPDF()">Gerar PDF</button>
 
@@ -154,7 +154,7 @@ button{
 </div>
 
 <div class="footer">
-Patrícia Reis Ateliê de Costura • Sistema Interno
+Ateliê Patrícia Reis • Sistema Interno
 </div>
 
 </div>
@@ -172,9 +172,9 @@ function showTab(id){
 
 function calcular(){
 
-let largura = parseFloat(document.getElementById("largura").value);
-let altura = parseFloat(document.getElementById("altura").value);
-let barra = parseFloat(document.getElementById("barra").value);
+let largura = parseFloat(document.getElementById("largura").value) || 0;
+let altura = parseFloat(document.getElementById("altura").value) || 0;
+let barra = parseFloat(document.getElementById("barra").value) || 0;
 let modelo = document.getElementById("modelo").value;
 let tipoForro = parseFloat(document.getElementById("tipoForro").value);
 let presilhas = parseInt(document.getElementById("presilhas").value) || 0;
@@ -218,8 +218,6 @@ alturasGaze, metragemGaze,
 alturasForro, metragemForro,
 rodizios, trilho, entretela,
 presilhas,
-custoMateriais,
-lucro,
 valorFinal
 };
 
@@ -232,8 +230,6 @@ Metragem: ${metragemGaze.toFixed(2)} m<br><br>
 Alturas: ${alturasForro}<br>
 Metragem: ${metragemForro.toFixed(2)} m<br><br>
 
-CUSTO MATERIAIS: R$ ${custoMateriais.toFixed(2)}<br>
-SEU LUCRO: R$ ${lucro.toFixed(2)}<br>
 <b>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</b>`;
 
 document.getElementById("resultadoMateriais").innerHTML =
@@ -277,8 +273,6 @@ color:#2c2c2c;
 background:white;
 position:relative;
 }
-
-/* Marca d'água */
 body::before{
 content:"";
 position:fixed;
@@ -292,31 +286,15 @@ width:100%;
 height:100%;
 z-index:-1;
 }
-
-/* Cabeçalho */
-.header{
-text-align:center;
-margin-bottom:50px;
-}
-
 h1{
 color:#5f7ea3;
 letter-spacing:3px;
-margin-bottom:5px;
+text-align:center;
 }
-
-.sub{
-color:#5f7ea3;
-font-size:14px;
-letter-spacing:2px;
-}
-
-/* Blocos */
 .section{
 margin-top:25px;
 line-height:1.8;
 }
-
 .titulo{
 color:#5f7ea3;
 font-weight:bold;
@@ -324,21 +302,15 @@ margin-top:30px;
 border-bottom:1px solid #5f7ea3;
 padding-bottom:5px;
 }
-
-/* Valor */
 .valor{
 margin-top:40px;
 font-size:26px;
 font-weight:bold;
-color:#000;
 }
-
-/* Assinatura */
 .assinatura{
 margin-top:80px;
 text-align:center;
 }
-
 .linha{
 margin-top:60px;
 border-top:1px solid #000;
@@ -346,14 +318,6 @@ width:300px;
 margin-left:auto;
 margin-right:auto;
 }
-
-.nome-ass{
-margin-top:10px;
-font-weight:bold;
-color:#5f7ea3;
-}
-
-/* Rodapé */
 .footer{
 margin-top:80px;
 font-size:12px;
@@ -366,23 +330,20 @@ padding-top:15px;
 </head>
 <body>
 
-<div class="header">
 <h1>ATELIÊ PATRÍCIA REIS</h1>
-<div class="sub">CORTINAS SOB MEDIDA</div>
-</div>
 
 <div class="section">
 <b>Cliente:</b> ${cliente}<br>
 <b>Data:</b> ${dataFormatada}
 </div>
 
-<div class="titulo">Especificações Técnicas</div>
+<div class="titulo">Especificações</div>
 <div class="section">
 Largura: ${dadosGlobais.largura} m<br>
 Altura: ${dadosGlobais.altura} m<br>
 Barra: ${dadosGlobais.barra} m<br>
 Modelo: ${modeloTexto}<br>
-Forro: ${tipoForroTexto}<br>
+Forro: ${tipoForroTexto}
 </div>
 
 <div class="titulo">Materiais</div>
@@ -395,11 +356,10 @@ Presilhas: ${dadosGlobais.presilhas} un<br>
 Trilho: ${dadosGlobais.trilho} m
 </div>
 
-<div class="titulo">Condições Comerciais</div>
+<div class="titulo">Condições</div>
 <div class="section">
 ${pagamento}<br><br>
-Prazo de produção: até 15 dias úteis após confirmação do pagamento.<br>
-Instalação inclusa conforme orçamento.
+Prazo: até 15 dias úteis após confirmação do pagamento.
 </div>
 
 <div class="valor">
@@ -408,14 +368,11 @@ VALOR TOTAL: R$ ${dadosGlobais.valorFinal.toFixed(2)}
 
 <div class="assinatura">
 <div class="linha"></div>
-<div class="nome-ass">Patrícia Reis</div>
-Ateliê Patrícia Reis
+Patrícia Reis
 </div>
 
 <div class="footer">
-Ateliê Patrícia Reis – Cortinas Sob Medida<br>
-Franca - SP<br>
-Telefone: (coloque aqui seu número)
+Ateliê Patrícia Reis • Cortinas sob medida • Franca - SP
 </div>
 
 </body>
