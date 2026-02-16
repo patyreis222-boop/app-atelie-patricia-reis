@@ -1,215 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ateliê Patrícia Reis</title>
 
 <style>
 body{
-font-family: Arial, sans-serif;
-background:#ffffff;
-margin:0;
-padding:20px;
+  font-family: Arial, sans-serif;
+  background:#ffffff;
+  margin:0;
+  padding:20px;
 }
-
+.container{
+  max-width:700px;
+  margin:auto;
+}
 .logo{
-text-align:center;
-margin-bottom:20px;
+  text-align:center;
+  margin-bottom:20px;
 }
-
 .logo img{
-max-width:300px;
+  max-width:300px;
 }
-
 .tabs{
-display:flex;
-gap:10px;
-margin-bottom:20px;
+  display:flex;
+  gap:5px;
+  margin-bottom:15px;
 }
-
 .tabs button{
-flex:1;
-padding:12px;
-border:none;
-background:#e5e5e5;
-cursor:pointer;
-font-weight:bold;
+  flex:1;
+  padding:10px;
+  border:none;
+  background:#e0e0e0;
+  cursor:pointer;
+  font-weight:bold;
 }
-
 .tabs button.active{
-background:#5b7fa3;
-color:white;
+  background:#3b5fa0;
+  color:#fff;
 }
-
 .section{
-display:none;
+  display:none;
 }
-
 .section.active{
-display:block;
+  display:block;
 }
-
 input, select{
-width:100%;
-padding:10px;
-margin-bottom:12px;
-border-radius:6px;
-border:1px solid #ccc;
+  width:100%;
+  padding:8px;
+  margin:6px 0 12px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
-
 button.calcular{
-width:100%;
-padding:14px;
-background:#5b7fa3;
-color:white;
-border:none;
-font-size:16px;
-cursor:pointer;
+  width:100%;
+  padding:12px;
+  background:#3b5fa0;
+  color:#fff;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
 }
-
 .resultado{
-background:#f2f2f2;
-padding:15px;
-margin-top:15px;
+  background:#f2f2f2;
+  padding:15px;
+  margin-top:15px;
+  border-radius:8px;
+}
+h3{
+  margin-top:0;
 }
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
 <div class="logo">
 <img src="logo.png">
 </div>
 
 <div class="tabs">
-<button onclick="mostrar(0)" class="active">TÉCNICO</button>
-<button onclick="mostrar(1)">MATERIAIS</button>
-<button onclick="mostrar(2)">ORÇAMENTO</button>
+<button class="active" onclick="abrirAba('tecnico', this)">TÉCNICO</button>
+<button onclick="abrirAba('materiais', this)">MATERIAIS</button>
+<button onclick="abrirAba('orcamento', this)">ORÇAMENTO</button>
 </div>
 
-<div class="section active">
+<!-- ================= TÉCNICO ================= -->
+
+<div id="tecnico" class="section active">
 
 <h3>Dados</h3>
 
 <input id="largura" placeholder="Largura (m)">
 <input id="altura" placeholder="Altura (m)">
 
-<select id="modo">
-<option value="gaze">Só Gaze</option>
-<option value="gaze_forro">Gaze + Forro</option>
+<select id="modelo">
+<option value="gaze">Gaze</option>
+<option value="gaze+forro">Gaze + Forro</option>
 </select>
 
-<select id="forro">
-<option value="13">Microfibra (R$13)</option>
-<option value="23">Blackout 70% (R$23)</option>
-<option value="31">Blackout 100% (R$31)</option>
+<select id="tipoForro">
+<option value="microfibra">Microfibra</option>
+<option value="black70">Blackout 70%</option>
+<option value="black100">Blackout 100%</option>
 </select>
 
-<input id="presilhaManual" placeholder="Presilhas (manual)">
+<input id="presilhas" placeholder="Presilhas (manual)">
 <input id="instalacao" placeholder="Instalação (R$)">
 <input id="desconto" placeholder="Desconto (R$)">
 
 <button class="calcular" onclick="calcular()">Calcular</button>
 
-<div class="resultado" id="resultado"></div>
+<div id="resultadoTecnico" class="resultado"></div>
 
 </div>
 
-<div class="section">
-<div id="materiais"></div>
+<!-- ================= MATERIAIS ================= -->
+
+<div id="materiais" class="section">
+<div id="resultadoMateriais" class="resultado"></div>
 </div>
 
-<div class="section">
-<div id="cliente"></div>
+<!-- ================= ORÇAMENTO ================= -->
+
+<div id="orcamento" class="section">
+
+<input id="cliente" placeholder="Nome do cliente">
+<input id="prazo" placeholder="Prazo de entrega">
+<input id="pagamento" placeholder="Forma de pagamento (ex: 50% entrada / 50% entrega)">
+
+<div id="resultadoOrcamento" class="resultado"></div>
+
+</div>
+
 </div>
 
 <script>
 
-function mostrar(i){
-let tabs=document.querySelectorAll(".tabs button");
-let sec=document.querySelectorAll(".section");
-
-tabs.forEach(t=>t.classList.remove("active"));
-sec.forEach(s=>s.classList.remove("active"));
-
-tabs[i].classList.add("active");
-sec[i].classList.add("active");
+function abrirAba(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
 }
 
 function calcular(){
 
-let largura=parseFloat(document.getElementById("largura").value);
-let altura=parseFloat(document.getElementById("altura").value);
-let modo=document.getElementById("modo").value;
-let forroValor=parseFloat(document.getElementById("forro").value);
-let presilhaManual=parseFloat(document.getElementById("presilhaManual").value||0);
-let instalacao=parseFloat(document.getElementById("instalacao").value||0);
-let desconto=parseFloat(document.getElementById("desconto").value||0);
+const largura = parseFloat(document.getElementById("largura").value);
+const altura = parseFloat(document.getElementById("altura").value);
+const modelo = document.getElementById("modelo").value;
+const tipoForro = document.getElementById("tipoForro").value;
+const presilhasManual = parseInt(document.getElementById("presilhas").value) || 0;
+const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
+const desconto = parseFloat(document.getElementById("desconto").value) || 0;
 
-let gazePreco=26;
-let entretelaPreco=1.60;
-let rodizioPreco=0.12;
-let presilhaPreco=1.60;
-let trilhoPreco=15;
+const larguraTecido = 3;
 
-let maoObra = (modo=="gaze") ? largura*150 : largura*200;
+const precoRodizio = 0.12;
+const precoPresilha = 1.60;
+const precoEntretela = 1.60;
+const precoTrilho = 15;
+const precoGaze = 26;
+const precoMicrofibra = 13;
+const precoBlack70 = 23;
+const precoBlack100 = 31;
 
-let alturasGaze=Math.ceil((largura*2)/1.40);
-let metragemGaze=alturasGaze*altura;
+const alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
+const metragemGaze = alturasGaze * altura;
 
-let alturasForro= (modo=="gaze_forro") ? Math.ceil(largura/1.40) : 0;
-let metragemForro=alturasForro*altura;
+let alturasForro = 0;
+let metragemForro = 0;
+let precoForroMetro = 0;
 
-let rodizios=Math.ceil(largura*20);
+if(modelo === "gaze+forro"){
+  alturasForro = Math.ceil((largura * 2) / larguraTecido);
+  metragemForro = alturasForro * altura;
 
-let custoMateriais=
-(metragemGaze*gazePreco)+
-(metragemForro*forroValor)+
-(metragemGaze*entretelaPreco)+
-(rodizios*rodizioPreco)+
-(presilhaManual*presilhaPreco)+
-(largura*trilhoPreco);
+  if(tipoForro === "microfibra") precoForroMetro = precoMicrofibra;
+  if(tipoForro === "black70") precoForroMetro = precoBlack70;
+  if(tipoForro === "black100") precoForroMetro = precoBlack100;
+}
 
-let valorFinal=custoMateriais+maoObra+instalacao-desconto;
+const rodizios = Math.ceil(largura * 20);
+const entretela = metragemGaze;
+const trilho = largura;
 
-let lucro=maoObra+instalacao;
+const custoMateriais =
+(metragemGaze * precoGaze) +
+(metragemForro * precoForroMetro) +
+(rodizios * precoRodizio) +
+(presilhasManual * precoPresilha) +
+(entretela * precoEntretela) +
+(trilho * precoTrilho);
 
-document.getElementById("resultado").innerHTML=`
+const maoDeObraMetro = modelo === "gaze+forro" ? 200 : 150;
+const maoDeObra = largura * maoDeObraMetro;
+
+const seuLucro = maoDeObra + instalacao;
+
+const valorFinal = custoMateriais + seuLucro - desconto;
+
+document.getElementById("resultadoTecnico").innerHTML = `
 <b>GAZE:</b><br>
 Alturas: ${alturasGaze}<br>
 Metragem: ${metragemGaze.toFixed(2)} m<br><br>
 
+${modelo === "gaze+forro" ? `
 <b>FORRO:</b><br>
 Alturas: ${alturasForro}<br>
-Metragem: ${metragemForro.toFixed(2)} m<br><br>
+Metragem: ${metragemForro.toFixed(2)} m<br><br>` : ""}
 
 Rodízios: ${rodizios}<br>
-Entretela: ${metragemGaze.toFixed(2)} m<br>
-Trilho: ${largura} m<br><br>
+Entretela: ${entretela.toFixed(2)} m<br>
+Trilho: ${trilho} m<br><br>
 
 <b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
-<b>SEU LUCRO (mão de obra + instalação):</b> R$ ${lucro.toFixed(2)}<br>
-<br>
-<h2>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
+<b>SEU LUCRO (mão de obra + instalação):</b> R$ ${seuLucro.toFixed(2)}<br>
+<b>VALOR FINAL:</b> R$ ${valorFinal.toFixed(2)}
 `;
 
-document.getElementById("materiais").innerHTML=`
-<h3>Resumo Materiais</h3>
-Gaze: ${metragemGaze.toFixed(2)} m<br>
-Forro: ${metragemForro.toFixed(2)} m<br>
-Entretela: ${metragemGaze.toFixed(2)} m<br>
-Rodízios: ${rodizios}<br>
-Trilho: ${largura} m<br>
-Presilhas: ${presilhaManual}<br>
-<br>
-Total Materiais: R$ ${custoMateriais.toFixed(2)}
-`;
+document.getElementById("resultadoMateriais").innerHTML =
+document.getElementById("resultadoTecnico").innerHTML;
 
-document.getElementById("cliente").innerHTML=`
-<h3>Orçamento</h3>
-Valor total do serviço: <b>R$ ${valorFinal.toFixed(2)}</b><br><br>
-Forma de pagamento: ___________________<br>
-Nome do cliente: ___________________
+document.getElementById("resultadoOrcamento").innerHTML = `
+<b>Cliente:</b> ${document.getElementById("cliente").value}<br>
+<b>Prazo:</b> ${document.getElementById("prazo").value}<br>
+<b>Pagamento:</b> ${document.getElementById("pagamento").value}<br><br>
+<b>Valor Final:</b> R$ ${valorFinal.toFixed(2)}
 `;
 
 }
