@@ -251,21 +251,175 @@ document.getElementById("resultadoOrcamento").innerHTML =
 
 function gerarPDF(){
 
-let cliente = document.getElementById("cliente").value;
-let pagamento = document.getElementById("pagamento").value;
+let cliente = document.getElementById("cliente").value || "Cliente";
+let pagamento = document.getElementById("pagamento").value || "Conforme combinado";
+let hoje = new Date();
+let dataFormatada = hoje.toLocaleDateString("pt-BR");
+
+let modeloTexto = document.getElementById("modelo").value == "gaze"
+? "Cortina em Gaze"
+: "Cortina em Gaze + Forro";
+
+let tipoForroTexto = document.getElementById("tipoForro").options[
+document.getElementById("tipoForro").selectedIndex].text;
 
 let janela = window.open('');
+
 janela.document.write(`
-<h2>Orçamento - Patrícia Reis Ateliê de Costura</h2>
-Cliente: ${cliente}<br><br>
-Valor Final: R$ ${dadosGlobais.valorFinal.toFixed(2)}<br><br>
-Condições: ${pagamento}<br><br>
-<hr>
-<p style="font-size:12px;">
-Patrícia Reis Ateliê de Costura<br>
-Confecção de cortinas sob medida<br>
-Franca - SP
-</p>
+<html>
+<head>
+<title>Orçamento - Ateliê Patrícia Reis</title>
+<style>
+body{
+font-family: Arial;
+padding:60px;
+color:#2c2c2c;
+background:white;
+position:relative;
+}
+
+/* Marca d'água */
+body::before{
+content:"";
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%, -50%);
+background:url('logo.png') no-repeat center;
+background-size:400px;
+opacity:0.05;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+/* Cabeçalho */
+.header{
+text-align:center;
+margin-bottom:50px;
+}
+
+h1{
+color:#5f7ea3;
+letter-spacing:3px;
+margin-bottom:5px;
+}
+
+.sub{
+color:#5f7ea3;
+font-size:14px;
+letter-spacing:2px;
+}
+
+/* Blocos */
+.section{
+margin-top:25px;
+line-height:1.8;
+}
+
+.titulo{
+color:#5f7ea3;
+font-weight:bold;
+margin-top:30px;
+border-bottom:1px solid #5f7ea3;
+padding-bottom:5px;
+}
+
+/* Valor */
+.valor{
+margin-top:40px;
+font-size:26px;
+font-weight:bold;
+color:#000;
+}
+
+/* Assinatura */
+.assinatura{
+margin-top:80px;
+text-align:center;
+}
+
+.linha{
+margin-top:60px;
+border-top:1px solid #000;
+width:300px;
+margin-left:auto;
+margin-right:auto;
+}
+
+.nome-ass{
+margin-top:10px;
+font-weight:bold;
+color:#5f7ea3;
+}
+
+/* Rodapé */
+.footer{
+margin-top:80px;
+font-size:12px;
+text-align:center;
+color:#777;
+border-top:1px solid #ddd;
+padding-top:15px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>ATELIÊ PATRÍCIA REIS</h1>
+<div class="sub">CORTINAS SOB MEDIDA</div>
+</div>
+
+<div class="section">
+<b>Cliente:</b> ${cliente}<br>
+<b>Data:</b> ${dataFormatada}
+</div>
+
+<div class="titulo">Especificações Técnicas</div>
+<div class="section">
+Largura: ${dadosGlobais.largura} m<br>
+Altura: ${dadosGlobais.altura} m<br>
+Barra: ${dadosGlobais.barra} m<br>
+Modelo: ${modeloTexto}<br>
+Forro: ${tipoForroTexto}<br>
+</div>
+
+<div class="titulo">Materiais</div>
+<div class="section">
+Gaze: ${dadosGlobais.metragemGaze.toFixed(2)} m<br>
+Forro: ${dadosGlobais.metragemForro.toFixed(2)} m<br>
+Entretela: ${dadosGlobais.entretela.toFixed(2)} m<br>
+Rodízios: ${dadosGlobais.rodizios} un<br>
+Presilhas: ${dadosGlobais.presilhas} un<br>
+Trilho: ${dadosGlobais.trilho} m
+</div>
+
+<div class="titulo">Condições Comerciais</div>
+<div class="section">
+${pagamento}<br><br>
+Prazo de produção: até 15 dias úteis após confirmação do pagamento.<br>
+Instalação inclusa conforme orçamento.
+</div>
+
+<div class="valor">
+VALOR TOTAL: R$ ${dadosGlobais.valorFinal.toFixed(2)}
+</div>
+
+<div class="assinatura">
+<div class="linha"></div>
+<div class="nome-ass">Patrícia Reis</div>
+Ateliê Patrícia Reis
+</div>
+
+<div class="footer">
+Ateliê Patrícia Reis – Cortinas Sob Medida<br>
+Franca - SP<br>
+Telefone: (coloque aqui seu número)
+</div>
+
+</body>
+</html>
 `);
 
 janela.print();
