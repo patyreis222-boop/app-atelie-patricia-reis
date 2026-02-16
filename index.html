@@ -3,142 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis</title>
+<title>Ateliê Patrícia Reis - Sistema</title>
 
 <style>
-body{font-family:Arial;background:#f4f4f4;padding:20px;}
-.container{max-width:600px;margin:auto;background:white;padding:20px;border-radius:8px;}
-h1{text-align:center;color:#3b5fa0;}
-input,select,button{width:100%;padding:10px;margin:8px 0;}
-button{background:#3b5fa0;color:white;border:none;}
-.resultado{background:#f1f1f1;padding:15px;margin-top:15px;}
-.final{font-size:20px;font-weight:bold;margin-top:10px;}
-.hidden{display:none;}
+body{
+    font-family: Arial, sans-serif;
+    background:#ffffff;
+    margin:0;
+    padding:20px;
+    color:#333;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.logo img{
+    max-width:300px;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tabs button{
+    flex:1;
+    padding:12px;
+    border:none;
+    background:#eaeaea;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.tabs button.active{
+    background:#5b7fa6;
+    color:#fff;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+input, select{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+button.calc{
+    background:#5b7fa6;
+    color:#fff;
+    border:none;
+    padding:12px;
+    width:100%;
+    font-size:16px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.result-box{
+    background:#f2f4f7;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+}
+
+.final{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h1>Cálculo Técnico</h1>
 
-<label>Largura (m)</label>
-<input type="number" id="largura" step="0.01">
-
-<label>Altura (m)</label>
-<input type="number" id="altura" step="0.01">
-
-<label>Tipo de Cortina</label>
-<select id="tipoCortina" onchange="mostrarForro()">
-<option value="gaze">Apenas Gaze</option>
-<option value="gazeForro">Gaze + Forro</option>
-</select>
-
-<div id="forroBox" class="hidden">
-<label>Tipo de Forro</label>
-<select id="tipoForro">
-<option value="micro">Microfibra (R$13)</option>
-<option value="black70">Blackout 70% (R$23)</option>
-<option value="black100">Blackout 100% (R$31)</option>
-</select>
+<div class="logo">
+    <img src="logo.png">
 </div>
 
-<label>Presilhas (manual)</label>
-<input type="number" id="presilhas" value="0">
+<div class="tabs">
+    <button onclick="showPage('tecnico')" class="active">Cálculo Técnico</button>
+    <button onclick="showPage('materiais')">Materiais</button>
+    <button onclick="showPage('cliente')">Orçamento Cliente</button>
+</div>
 
-<label>Instalação</label>
-<input type="number" id="instalacao" value="0">
+<!-- ================= TÉCNICO ================= -->
+<div id="tecnico" class="page active">
 
-<label>Desconto</label>
-<input type="number" id="desconto" value="0">
+<h3>Dados</h3>
 
-<button onclick="calcular()">Calcular</button>
+<input type="number" id="largura" placeholder="Largura (m)">
+<input type="number" id="altura" placeholder="Altura (m)">
 
-<div id="resultado" class="resultado"></div>
+<select id="modelo">
+<option value="gaze">Somente Gaze</option>
+<option value="gaze_forro">Gaze + Forro</option>
+</select>
+
+<select id="tipoForro">
+<option value="0">Sem Forro</option>
+<option value="13">Microfibra (R$13)</option>
+<option value="23">Blackout 70% (R$23)</option>
+<option value="31">Blackout 100% (R$31)</option>
+</select>
+
+<input type="number" id="presilhas" placeholder="Presilhas (manual)" value="0">
+<input type="number" id="instalacao" placeholder="Instalação (R$)" value="0">
+<input type="number" id="desconto" placeholder="Desconto (R$)" value="0">
+
+<button class="calc" onclick="calcular()">Calcular</button>
+
+<div id="resultadoTecnico" class="result-box"></div>
+</div>
+
+<!-- ================= MATERIAIS ================= -->
+<div id="materiais" class="page">
+<h3>Quantidades Necessárias</h3>
+<div id="resultadoMateriais" class="result-box"></div>
+</div>
+
+<!-- ================= CLIENTE ================= -->
+<div id="cliente" class="page">
+<h3>Orçamento</h3>
+
+<input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+
+<div id="resultadoCliente" class="result-box"></div>
+</div>
 
 </div>
 
 <script>
 
-function mostrarForro(){
-let tipo = document.getElementById("tipoCortina").value;
-let box = document.getElementById("forroBox");
-if(tipo === "gazeForro"){
-box.classList.remove("hidden");
-}else{
-box.classList.add("hidden");
-}
+function showPage(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+
+    document.getElementById(page).classList.add('active');
+    event.target.classList.add('active');
 }
 
 function calcular(){
 
 let largura = parseFloat(document.getElementById("largura").value);
 let altura = parseFloat(document.getElementById("altura").value);
-let tipoCortina = document.getElementById("tipoCortina").value;
-let tipoForro = document.getElementById("tipoForro")?.value;
-let presilhas = parseInt(document.getElementById("presilhas").value) || 0;
-let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
-let desconto = parseFloat(document.getElementById("desconto").value) || 0;
+let modelo = document.getElementById("modelo").value;
+let tipoForro = parseFloat(document.getElementById("tipoForro").value);
+let presilhas = parseInt(document.getElementById("presilhas").value);
+let instalacao = parseFloat(document.getElementById("instalacao").value);
+let desconto = parseFloat(document.getElementById("desconto").value);
 
-let larguraRolo = 3;
-let alturaReal = altura + 0.44;
+let fatorGaze = 3.5;
+let fatorForro = 2;
 
-// ===== GAZE =====
-let alturasGaze = Math.ceil((largura * 3.5) / larguraRolo);
-let metragemGaze = alturasGaze * alturaReal;
+let alturasGaze = Math.ceil((largura * fatorGaze) / 3);
+let alturasForro = Math.ceil((largura * fatorForro) / 3);
+
+let metragemGaze = alturasGaze * (altura + 0.44);
+let metragemForro = alturasForro * (altura + 0.44);
+
 let custoGaze = metragemGaze * 26;
-let custoEntretela = metragemGaze * 1.60;
+let custoForro = metragemForro * tipoForro;
 
-// ===== FORRO =====
-let alturasForro = 0;
-let metragemForro = 0;
-let custoForro = 0;
+let entretela = metragemGaze;
+let custoEntretela = entretela * 1.60;
 
-if(tipoCortina === "gazeForro"){
-alturasForro = Math.ceil((largura * 2) / larguraRolo);
-metragemForro = alturasForro * alturaReal;
-
-let valorForro = 13;
-if(tipoForro === "black70") valorForro = 23;
-if(tipoForro === "black100") valorForro = 31;
-
-custoForro = metragemForro * valorForro;
-}
-
-// ===== RODÍZIOS =====
 let rodizios = Math.ceil((largura * 100) / 10);
-if(tipoCortina === "gazeForro"){
-rodizios *= 2;
-}
-let custoRodizio = rodizios * 0.12;
+if(modelo === "gaze_forro"){ rodizios *= 2; }
 
-// ===== OUTROS =====
+let custoRodizio = rodizios * 0.12;
 let custoPresilha = presilhas * 1.60;
 let custoTrilho = largura * 15;
 
-// ===== TOTAL =====
-let custoTecnico = custoGaze + custoEntretela + custoForro + custoRodizio + custoPresilha + custoTrilho;
+let maoDeObra = largura * (modelo === "gaze_forro" ? 200 : 150);
 
-let valorVenda = (tipoCortina === "gazeForro") ? largura * 200 : largura * 150;
-let lucro = valorVenda - custoTecnico;
-let valorFinal = valorVenda + instalacao - desconto;
+let custoTecnico = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
 
-document.getElementById("resultado").innerHTML = `
+let valorFinal = maoDeObra + instalacao - desconto;
+let lucro = valorFinal - custoTecnico;
+
+document.getElementById("resultadoTecnico").innerHTML = `
 <b>GAZE</b><br>
 Alturas: ${alturasGaze}<br>
 Metragem: ${metragemGaze.toFixed(2)} m<br><br>
 
 <b>FORRO</b><br>
-Alturas: ${alturasForro}<br>
-Metragem: ${metragemForro.toFixed(2)} m<br><br>
+Alturas: ${modelo==="gaze_forro"?alturasForro:0}<br>
+Metragem: ${modelo==="gaze_forro"?metragemForro.toFixed(2):0} m<br><br>
 
-Rodízios: ${rodizios}<br><br>
+Rodízios: ${rodizios}<br>
+Entretela: ${entretela.toFixed(2)} m<br>
+Trilho: ${largura} m<br>
+Mão de obra: R$ ${maoDeObra.toFixed(2)}<br><br>
 
 <b>CUSTO TÉCNICO:</b> R$ ${custoTecnico.toFixed(2)}<br>
 Lucro: R$ ${lucro.toFixed(2)}<br>
+
 <div class="final">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</div>
 `;
 
+document.getElementById("resultadoMateriais").innerHTML = `
+Gaze: ${metragemGaze.toFixed(2)} m<br>
+Forro: ${modelo==="gaze_forro"?metragemForro.toFixed(2):0} m<br>
+Rodízios: ${rodizios}<br>
+Entretela: ${entretela.toFixed(2)} m<br>
+Trilho: ${largura} m<br>
+Presilhas: ${presilhas}
+`;
+
+document.getElementById("resultadoCliente").innerHTML = `
+<b>Cliente:</b> ${document.getElementById("nomeCliente").value}<br><br>
+<div class="final">VALOR TOTAL: R$ ${valorFinal.toFixed(2)}</div><br>
+
+Forma de pagamento:<br>
+50% entrada + 50% na entrega<br>
+Pix disponível<br>
+Parcelamento até 3x com juros<br><br>
+
+Prazo: Sob consulta
+`;
 }
 
 </script>
