@@ -3,62 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis - Orçamento</title>
+<title>BP Confecções - Orçamento</title>
 
 <style>
 body{
-font-family: Arial, sans-serif;
-background:#ffffff;
-margin:0;
-padding:20px;
+    font-family: Arial, sans-serif;
+    background:#ffffff;
+    margin:0;
+    padding:20px;
 }
-
 .container{
-max-width:520px;
-margin:auto;
+    max-width:500px;
+    margin:auto;
 }
-
-h1{
-text-align:center;
-
-  
-color:#4A6FA5;
+h2{
+    text-align:center;
 }
-
-input, select{
-width:100%;
-padding:10px;
-margin:6px 0 14px 0;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:16px;
+input, select, button{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
 }
-
 button{
-width:100%;
-padding:14px;
-background:#4A6FA5;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-margin-top:10px;
+    background:#1f3c88;
+    color:white;
+    font-weight:bold;
 }
-
 .result{
-margin-top:20px;
-padding:15px;
-background:#f3f6fb;
-border-radius:10px;
-font-size:15px;
+    background:#f4f6fb;
+    padding:15px;
+    border-radius:8px;
+    margin-top:15px;
+}
+.final{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:15px;
 }
 </style>
 </head>
 
 <body>
-<div class="container">
 
-<h1>Orçamento</h1>
+<div class="container">
+<h2>BP Confecções</h2>
 
 <label>Largura (m)</label>
 <input type="number" id="largura" step="0.01">
@@ -66,20 +56,10 @@ font-size:15px;
 <label>Altura (m)</label>
 <input type="number" id="altura" step="0.01">
 
-<label>Modelo</label>
-<select id="modelo">
-<option>Prega Macho</option>
-<option>Wave</option>
-<option>Americana</option>
-<option>Ilhós</option>
-</select>
-
 <label>Tipo</label>
 <select id="tipo">
-<option value="sem">Sem Forro</option>
-<option value="micro">Microfibra</option>
-<option value="70">Blackout 70%</option>
-<option value="100">Blackout 100%</option>
+<option value="sem">Sem forro</option>
+<option value="com">Com forro</option>
 </select>
 
 <label>Valor metro linear SEM forro</label>
@@ -88,20 +68,19 @@ font-size:15px;
 <label>Valor metro linear COM forro</label>
 <input type="number" id="valorCom" value="200">
 
-<label>Valor instalação (opcional)</label>
+<label>Valor instalação</label>
 <input type="number" id="instalacao" value="0">
 
-<label>Desconto (R$)</label>
+<label>Desconto</label>
 <input type="number" id="desconto" value="0">
 
 <button onclick="calcular()">Calcular</button>
 
-<div class="result" id="resultado"></div>
+<div class="result" id="resultado" style="display:none;"></div>
 
 </div>
 
 <script>
-
 function calcular(){
 
 let largura = parseFloat(document.getElementById("largura").value);
@@ -113,103 +92,73 @@ let instalacao = parseFloat(document.getElementById("instalacao").value);
 let desconto = parseFloat(document.getElementById("desconto").value);
 
 if(!largura || !altura){
-alert("Preencha largura e altura");
-return;
+    alert("Preencha largura e altura");
+    return;
 }
 
-/* =======================
-CÁLCULO GAZE
-largura x 3.5 / 3 = quantidade de alturas
-======================= */
+// ===== CÁLCULO TÉCNICO =====
 
+// Alturas necessárias
 let alturas = Math.ceil((largura * 3.5) / 3);
 
-let barraExtra = 0.32; 
-let alturaFinal = altura + 0.12 + barraExtra;
+// Consumo tecido principal
+let alturaReal = altura + 0.12 + 0.32;
+let consumoPrincipal = alturas * alturaReal;
 
-let metrosGaze = alturas * alturaFinal;
-
-/* =======================
-FORRO / BLACKOUT
-largura x2
-======================= */
-
-let metrosForro = 0;
-
-if(tipo !== "sem"){
-let alturasForro = Math.ceil((largura * 2) / 3);
-metrosForro = alturasForro * alturaFinal;
+// Forro
+let consumoForro = 0;
+if(tipo === "com"){
+    consumoForro = (largura * 2) * alturaReal;
 }
 
-/* =======================
-RODÍZIO
-1 a cada 10cm
-======================= */
-
+// Rodízios
 let rodizios = Math.ceil((largura * 100) / 10);
+if(tipo === "com"){
+    rodizios = rodizios * 2;
+}
 
-/* =======================
-TRILHO
-mesma largura
-======================= */
+// Entretela e presilha entram no custo técnico (simples exemplo fixo)
+let custoEntretela = consumoPrincipal * 5;
+let custoPresilha = rodizios * 0.5;
 
-let trilho = largura * 16;
+// Mão de obra estimada
+let maoObra = largura * 50;
 
-/* =======================
-CUSTOS FIXOS
-======================= */
+// Custo técnico total
+let custoTecnico = consumoPrincipal*30 + consumoForro*25 + custoEntretela + custoPresilha + maoObra;
 
-let custoGaze = metrosGaze * 27;
-let custoMicro = metrosForro * 15;
-let custo70 = metrosForro * 25;
-let custo100 = metrosForro * 33;
-
-let custoForro = 0;
-
-if(tipo === "micro") custoForro = custoMicro;
-if(tipo === "70") custoForro = custo70;
-if(tipo === "100") custoForro = custo100;
-
-/* =======================
-MÃO DE OBRA
-======================= */
-
-let maoObra = 0;
+// ===== VALOR DE VENDA FIXO =====
+let valorVenda = 0;
 
 if(tipo === "sem"){
-maoObra = largura * valorSem;
+    valorVenda = largura * valorSem;
 }else{
-maoObra = largura * valorCom;
+    valorVenda = largura * valorCom;
 }
 
-/* =======================
-CUSTO TOTAL
-======================= */
+// Valor final
+let valorFinal = valorVenda + instalacao - desconto;
 
-let custoTotal = custoGaze + custoForro + trilho + maoObra + instalacao - desconto;
+// Lucro
+let lucro = valorVenda - custoTecnico;
 
-/* =======================
-LUCRO REAL
-======================= */
+// Mostrar resultado
+let resultado = document.getElementById("resultado");
+resultado.style.display = "block";
+resultado.innerHTML = `
+<b>Cálculo Técnico:</b><br>
+Alturas necessárias: ${alturas} un<br>
+Rodízios: ${rodizios} un<br>
+Custo técnico estimado: R$ ${custoTecnico.toFixed(2)}<br>
+Lucro estimado: R$ ${lucro.toFixed(2)}<br>
 
-let lucro = custoTotal - (custoGaze + custoForro + trilho);
-
-/* =======================
-RESULTADO
-======================= */
-
-document.getElementById("resultado").innerHTML = `
-<b>Alturas necessárias:</b> ${alturas} un<br>
-<b>Consumo Gaze:</b> ${metrosGaze.toFixed(2)} m<br>
-<b>Consumo Forro:</b> ${metrosForro.toFixed(2)} m<br>
-<b>Rodízios:</b> ${rodizios} un<br>
-<b>Trilho:</b> R$ ${trilho.toFixed(2)}<br>
-<b>Confecção:</b> R$ ${maoObra.toFixed(2)}<br>
-<br>
-<b>CUSTO BASE:</b> R$ ${custoTotal.toFixed(2)}<br>
-<b>Lucro:</b> R$ ${lucro.toFixed(2)}<br>
-<br>
-<h2>VALOR FINAL: R$ ${custoTotal.toFixed(2)}</h2>
+<div class="final">
+VALOR FINAL: R$ ${valorFinal.toFixed(2)}
+</div>
 `;
 
 }
+</script>
+
+</body>
+</html>
