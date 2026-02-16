@@ -7,11 +7,12 @@
 body{font-family:Arial;padding:20px;}
 input,select,button{width:100%;margin-bottom:10px;padding:8px;}
 .result{background:#f2f4f8;padding:15px;margin-top:15px;}
+.final{font-size:20px;font-weight:bold;margin-top:10px;}
 </style>
 </head>
 <body>
 
-<h2>Cálculo Técnico - Ateliê Patrícia Reis</h2>
+<h2>Cálculo Técnico</h2>
 
 <label>Largura (m)</label>
 <input type="number" id="largura" step="0.01">
@@ -19,12 +20,9 @@ input,select,button{width:100%;margin-bottom:10px;padding:8px;}
 <label>Altura (m)</label>
 <input type="number" id="altura" step="0.01">
 
-<label>Barra (cm)</label>
-<input type="number" id="barra" value="32">
-
 <label>Tipo de Forro</label>
-<select id="tipo">
-<option value="sem">Sem Forro</option>
+<select id="forro">
+<option value="sem">Sem forro</option>
 <option value="micro">Microfibra</option>
 <option value="70">Blackout 70%</option>
 <option value="100">Blackout 100%</option>
@@ -48,87 +46,93 @@ function calcular(){
 
 let largura = parseFloat(document.getElementById("largura").value);
 let altura = parseFloat(document.getElementById("altura").value);
-let barra = parseFloat(document.getElementById("barra").value)/100;
-let tipo = document.getElementById("tipo").value;
+let forro = document.getElementById("forro").value;
 let presilhas = parseFloat(document.getElementById("presilhas").value);
 let instalacao = parseFloat(document.getElementById("instalacao").value);
 let desconto = parseFloat(document.getElementById("desconto").value);
 
-// PREÇOS
-let precoGaze = 26;
-let precoMicro = 13;
-let preco70 = 23;
-let preco100 = 31;
-let precoEntretela = 1.60;
-let precoRodizio = 0.12;
-let precoPresilha = 1.60;
-let precoTrilho = 15;
+// VALORES FIXOS
+let valorGaze = 26;
+let valorMicro = 13;
+let valor70 = 23;
+let valor100 = 31;
+let valorEntretela = 1.60;
+let valorRodizio = 0.12;
+let valorPresilha = 1.60;
+let valorTrilho = 15;
 
-// === ALTURA REAL ===
-let alturaReal = altura + 0.12 + barra;
+// FRANZIMENTO
+let fator = (forro === "sem") ? 3.5 : 2;
 
-// === GAZE ===
-let alturasGaze = Math.ceil((largura * 3.5) / 3);
-let metragemGaze = alturasGaze * alturaReal;
-let custoGaze = metragemGaze * precoGaze;
+// ALTURAS
+let alturas = Math.ceil((largura * fator) / 3);
 
-// === ENTRETELA ===
-let custoEntretela = metragemGaze * precoEntretela;
+// ALTURA REAL
+let alturaReal = altura + 0.44;
 
-// === FORRO ===
+// CONSUMO GAZE
+let metragemGaze = alturas * alturaReal;
+
+// CONSUMO FORRO
 let metragemForro = 0;
-let custoForro = 0;
+let valorForroMetro = 0;
 
-if(tipo !== "sem"){
-    let alturasForro = Math.ceil((largura * 2) / 3);
-    metragemForro = alturasForro * alturaReal;
-
-    if(tipo === "micro") custoForro = metragemForro * precoMicro;
-    if(tipo === "70") custoForro = metragemForro * preco70;
-    if(tipo === "100") custoForro = metragemForro * preco100;
+if(forro === "micro"){
+    metragemForro = alturas * alturaReal;
+    valorForroMetro = valorMicro;
+}
+if(forro === "70"){
+    metragemForro = alturas * alturaReal;
+    valorForroMetro = valor70;
+}
+if(forro === "100"){
+    metragemForro = alturas * alturaReal;
+    valorForroMetro = valor100;
 }
 
-// === RODÍZIOS ===
-let rodizios = Math.ceil(largura * 10);
-if(tipo !== "sem"){ rodizios *= 2; }
-let custoRodizios = rodizios * precoRodizio;
+// RODÍZIOS
+let rodizios = Math.ceil((largura * 100) / 10);
+if(forro !== "sem"){
+    rodizios = rodizios * 2;
+}
 
-// === PRESILHAS ===
-let custoPresilhas = presilhas * precoPresilha;
+// CUSTOS
+let custoGaze = metragemGaze * valorGaze;
+let custoForro = metragemForro * valorForroMetro;
+let custoEntretela = metragemGaze * valorEntretela;
+let custoRodizio = rodizios * valorRodizio;
+let custoPresilha = presilhas * valorPresilha;
+let custoTrilho = largura * valorTrilho;
 
-// === TRILHO ===
-let custoTrilho = largura * precoTrilho;
+let custoTecnico = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
 
-// === CUSTO TÉCNICO TOTAL ===
-let custoTecnico =
-custoGaze +
-custoEntretela +
-custoForro +
-custoRodizios +
-custoPresilhas +
-custoTrilho;
+// VALOR VENDA
+let valorVenda = (forro === "sem") ? largura*150 : largura*200;
 
-// === VALOR VENDA BASE ===
-let valorVenda = (tipo === "sem") ? largura * 150 : largura * 200;
-
-// === VALOR FINAL ===
 let valorFinal = valorVenda + instalacao - desconto;
 
-// === LUCRO ===
 let lucro = valorVenda - custoTecnico;
 
 document.getElementById("resultado").innerHTML = `
-<b>Alturas Gaze:</b> ${alturasGaze}<br>
-<b>Metragem Gaze:</b> ${metragemGaze.toFixed(2)} m<br>
-<b>Metragem Forro:</b> ${metragemForro.toFixed(2)} m<br>
-<b>Rodízios:</b> ${rodizios}<br>
-<b>Custo Técnico Total:</b> R$ ${custoTecnico.toFixed(2)}<br>
-<b>Lucro (sem instalação):</b> R$ ${lucro.toFixed(2)}<br><br>
-<b>VALOR FINAL:</b> R$ ${valorFinal.toFixed(2)}
+Alturas necessárias: ${alturas} <br>
+Metragem Gaze: ${metragemGaze.toFixed(2)} m <br>
+Metragem Forro: ${metragemForro.toFixed(2)} m <br>
+Rodízios: ${rodizios} <br>
+<br>
+Custo Gaze: R$ ${custoGaze.toFixed(2)} <br>
+Custo Forro: R$ ${custoForro.toFixed(2)} <br>
+Custo Entretela: R$ ${custoEntretela.toFixed(2)} <br>
+Custo Rodízio: R$ ${custoRodizio.toFixed(2)} <br>
+Custo Presilha: R$ ${custoPresilha.toFixed(2)} <br>
+Custo Trilho: R$ ${custoTrilho.toFixed(2)} <br>
+<br>
+<b>CUSTO TÉCNICO: R$ ${custoTecnico.toFixed(2)}</b> <br>
+<b>LUCRO: R$ ${lucro.toFixed(2)}</b> <br>
+<div class="final">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</div>
 `;
 
 }
 </script>
 
 </body>
-</html> be
+</html>
