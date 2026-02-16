@@ -3,137 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis - Orçamento</title>
+<title>Ateliê Patrícia Reis</title>
 
 <style>
 body{
     font-family: Arial, sans-serif;
     background:#ffffff;
-    margin:0;
-    padding:20px;
-}
-.container{
-    max-width:600px;
-    margin:auto;
+    text-align:center;
+    padding:40px;
 }
 h1{
-    text-align:center;
     color:#3b5fa0;
 }
-input, select{
-    width:100%;
-    padding:10px;
-    margin-bottom:12px;
-}
-button{
-    width:100%;
-    padding:12px;
+a{
+    display:block;
+    margin:20px auto;
+    padding:15px;
+    width:250px;
     background:#3b5fa0;
     color:white;
-    border:none;
+    text-decoration:none;
+    border-radius:8px;
     font-size:16px;
-}
-.resultado{
-    margin-top:20px;
-    padding:15px;
-    background:#f2f4f8;
-}
-.final{
-    font-size:22px;
-    font-weight:bold;
-    margin-top:15px;
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-<h1>Orçamento</h1>
 
-<label>Largura (m)</label>
-<input type="number" id="largura" step="0.01">
+<h1>Ateliê Patrícia Reis</h1>
 
-<label>Altura (m)</label>
-<input type="number" id="altura" step="0.01">
+<a href="tecnico.html">🔧 Cálculo Técnico</a>
+<a href="calculo.html">🧮 Cálculo Rápido</a>
+<a href="orcamento.html">📄 Orçamento Cliente</a>
 
-<label>Tipo</label>
-<select id="tipo">
-<option value="sem">Sem Forro</option>
-<option value="com">Com Forro</option>
-</select>
-
-<label>Valor metro linear SEM forro</label>
-<input type="number" id="valorSem" value="150">
-
-<label>Valor metro linear COM forro</label>
-<input type="number" id="valorCom" value="200">
-
-<label>Valor instalação (opcional)</label>
-<input type="number" id="instalacao" value="0">
-
-<label>Desconto (R$)</label>
-<input type="number" id="desconto" value="0">
-
-<button onclick="calcular()">Calcular</button>
-
-<div class="resultado" id="resultado" style="display:none;"></div>
-
-</div>
-
-<script>
-
-function calcular(){
-
-let largura = parseFloat(document.getElementById("largura").value);
-let altura = parseFloat(document.getElementById("altura").value);
-let tipo = document.getElementById("tipo").value;
-let valorSem = parseFloat(document.getElementById("valorSem").value);
-let valorCom = parseFloat(document.getElementById("valorCom").value);
-let instalacao = parseFloat(document.getElementById("instalacao").value);
-let desconto = parseFloat(document.getElementById("desconto").value);
-
-if(!largura || !altura){
-    alert("Preencha largura e altura");
-    return;
-}
-
-/* === CÁLCULO TÉCNICO === */
-
-// franzimento
-let fator = (tipo === "com") ? 2 : 3.5;
-
-// alturas necessárias
-let alturas = Math.ceil((largura * fator) / 3);
-
-// metragem total
-let metragemTotal = alturas * (altura + 0.44);
-
-// rodízios (1 a cada 10cm)
-let rodizios = Math.ceil((largura * 100) / 10);
-if(tipo === "com"){
-    rodizios = rodizios * 2;
-}
-
-// preço venda por metro linear
-let valorMetro = (tipo === "com") ? valorCom : valorSem;
-let valorVenda = largura * valorMetro;
-
-// valor final
-let valorFinal = valorVenda + instalacao - desconto;
-
-let resultado = document.getElementById("resultado");
-resultado.style.display = "block";
-resultado.innerHTML = `
-Alturas necessárias: ${alturas} un<br>
-Rodízios: ${rodizios} un<br>
-
-<div class="final">
-VALOR FINAL: R$ ${valorFinal.toFixed(2)}
-</div>
-`;
-
-}
-
-</script>
 </body>
 </html>
