@@ -24,152 +24,232 @@ body{
 }
 
 .logo img{
-    max-width:250px;
+    max-width:280px;
 }
 
-h2{
-    margin-top:25px;
-    color:#3b5fa0;
+.tabs{
+    display:flex;
+    gap:5px;
+    margin-bottom:20px;
 }
 
-input, select{
+.tabs button{
+    flex:1;
+    padding:10px;
+    border:none;
+    background:#e0e0e0;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.tabs button.active{
+    background:#5b7fa6;
+    color:white;
+}
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+input, select, textarea{
     width:100%;
     padding:10px;
-    margin:6px 0 15px;
-    border-radius:8px;
+    margin:8px 0;
+    border-radius:6px;
     border:1px solid #ccc;
 }
 
-button{
+button.calcular{
     width:100%;
-    padding:14px;
-    background:#3b5fa0;
+    padding:12px;
+    background:#5b7fa6;
     color:white;
     border:none;
-    border-radius:8px;
     font-size:16px;
+    border-radius:8px;
     cursor:pointer;
 }
 
 .resultado{
-    background:#f2f2f2;
-    padding:20px;
+    background:#f3f3f3;
+    padding:15px;
+    margin-top:15px;
     border-radius:10px;
-    margin-top:20px;
+}
+
+.final{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.pdf{
+    background:#2d6a4f;
+    margin-top:10px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <div class="logo">
 <img src="logo.png">
 </div>
 
-<h2>Dados da Cortina</h2>
+<div class="tabs">
+<button onclick="trocarAba('tecnico')" class="active">TÉCNICO</button>
+<button onclick="trocarAba('materiais')">MATERIAIS</button>
+<button onclick="trocarAba('orcamento')">ORÇAMENTO</button>
+</div>
 
-<label>Largura da cortina (m)</label>
-<input type="number" id="largura" step="0.01">
+<!-- ================= TÉCNICO ================= -->
 
-<label>Altura da cortina (m)</label>
-<input type="number" id="altura" step="0.01">
+<div id="tecnico" class="section active">
 
-<label>Tamanho da Barra (cm)</label>
-<input type="number" id="barra">
+<h3>Dados da Cortina</h3>
 
-<label>Modelo</label>
+<input id="largura" type="number" step="0.01" placeholder="Largura da cortina (m)">
+<input id="altura" type="number" step="0.01" placeholder="Altura da cortina (m)">
+<input id="barra" type="number" step="0.01" placeholder="Barra (m)">
+
 <select id="modelo">
-<option value="gaze">Somente Gaze</option>
+<option value="gaze">Só Gaze</option>
 <option value="gazeForro">Gaze + Forro</option>
 </select>
 
-<label>Tipo de Forro</label>
 <select id="tipoForro">
+<option value="13">Microfibra (R$13)</option>
 <option value="23">Blackout 70% (R$23)</option>
 <option value="31">Blackout 100% (R$31)</option>
-<option value="13">Microfibra (R$13)</option>
 </select>
 
-<label>Presilhas (unidade)</label>
-<input type="number" id="presilha">
+<input id="presilha" type="number" placeholder="Presilhas (unidade)">
+<input id="instalacao" type="number" placeholder="Instalação (R$)">
+<input id="maoObra" type="number" placeholder="Mão de obra (R$ por metro linear)">
 
-<label>Instalação (R$)</label>
-<input type="number" id="instalacao">
+<button class="calcular" onclick="calcular()">Calcular</button>
 
-<label>Mão de obra (R$ por metro linear)</label>
-<input type="number" id="maoObraMetro">
+<div id="resultado" class="resultado"></div>
 
-<button onclick="calcular()">Calcular</button>
+</div>
 
-<div class="resultado" id="resultado"></div>
+<!-- ================= MATERIAIS ================= -->
+
+<div id="materiais" class="section">
+<div id="materiaisDetalhe" class="resultado"></div>
+</div>
+
+<!-- ================= ORÇAMENTO ================= -->
+
+<div id="orcamento" class="section">
+
+<input id="cliente" placeholder="Nome do Cliente">
+<textarea id="condicoes" placeholder="Condições de pagamento"></textarea>
+
+<button class="calcular pdf" onclick="gerarPDF()">Gerar PDF</button>
+
+<div id="orcamentoFinal" class="resultado"></div>
+
+</div>
 
 </div>
 
 <script>
-function calcular(){
 
-let largura = parseFloat(document.getElementById("largura").value);
-let altura = parseFloat(document.getElementById("altura").value);
-let barra = parseFloat(document.getElementById("barra").value) / 100;
-let modelo = document.getElementById("modelo").value;
-let tipoForro = parseFloat(document.getElementById("tipoForro").value);
-let presilhaQtd = parseInt(document.getElementById("presilha").value) || 0;
-let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
-let maoObraMetro = parseFloat(document.getElementById("maoObraMetro").value) || 0;
+let dadosCalculo = {}
 
-let cabecalho = 0.12;
-let larguraTecido = 3;
+function trocarAba(id){
+    document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"))
+    document.getElementById(id).classList.add("active")
 
-// MULTIPLICADORES
-let multiplicadorGaze = 3.5;
-let multiplicadorForro = 2;
-
-// ALTURA REAL
-let alturaTotal = altura + cabecalho + barra;
-
-// ALTURAS NECESSÁRIAS
-let alturasGaze = Math.ceil((largura * multiplicadorGaze) / larguraTecido);
-let alturasForro = Math.ceil((largura * multiplicadorForro) / larguraTecido);
-
-// METRAGEM
-let metragemGaze = alturasGaze * alturaTotal;
-let metragemForro = alturasForro * alturaTotal;
-
-// PREÇOS
-let precoGaze = 26;
-let precoEntretela = 1.60;
-let precoRodizio = 0.12;
-let precoTrilho = 15;
-let precoPresilha = 1.60;
-
-// CUSTOS
-let custoGaze = metragemGaze * precoGaze;
-let custoEntretela = metragemGaze * precoEntretela;
-let custoRodizio = 60 * precoRodizio;
-let custoTrilho = largura * precoTrilho;
-let custoPresilha = presilhaQtd * precoPresilha;
-
-let custoForro = 0;
-
-if(modelo === "gazeForro"){
-    custoForro = metragemForro * tipoForro;
+    document.querySelectorAll(".tabs button").forEach(btn=>btn.classList.remove("active"))
+    event.target.classList.add("active")
 }
 
-// TOTAL MATERIAIS
-let custoMateriais = custoGaze + custoEntretela + custoRodizio + custoTrilho + custoPresilha + custoForro;
+function calcular(){
 
-// LUCRO (mão de obra + instalação)
-let maoObraTotal = largura * maoObraMetro;
-let seuLucro = maoObraTotal + instalacao;
+let largura = parseFloat(larguraInput = document.getElementById("largura").value)
+let altura = parseFloat(document.getElementById("altura").value)
+let barra = parseFloat(document.getElementById("barra").value) || 0
+let modelo = document.getElementById("modelo").value
+let tipoForro = parseFloat(document.getElementById("tipoForro").value)
+let presilha = parseInt(document.getElementById("presilha").value) || 0
+let instalacao = parseFloat(document.getElementById("instalacao").value) || 0
+let maoObraMetro = parseFloat(document.getElementById("maoObra").value) || 0
 
-let valorFinal = custoMateriais + seuLucro;
+let larguraTecido = 3
+let cabecalho = 0.12
+
+let alturaFinal = altura + cabecalho + barra
+
+let alturasGaze = Math.ceil((largura*3.5)/larguraTecido)
+let alturasForro = Math.ceil((largura*2)/larguraTecido)
+
+let metragemGaze = alturasGaze * alturaFinal
+let metragemForro = alturasForro * alturaFinal
+
+let custoGaze = metragemGaze * 26
+let custoForro = modelo === "gazeForro" ? metragemForro * tipoForro : 0
+
+let custoEntretela = metragemGaze * 1.60
+let custoRodizio = 60 * 0.12
+let custoPresilha = presilha * 1.60
+let custoTrilho = largura * 15
+
+let custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho
+
+let maoObra = largura * maoObraMetro
+
+let valorFinal = custoMateriais + maoObra + instalacao
+
+dadosCalculo = {
+cliente:"",
+valorFinal,
+custoMateriais,
+maoObra,
+instalacao
+}
 
 document.getElementById("resultado").innerHTML = `
 <b>GAZE:</b><br>
 Alturas: ${alturasGaze}<br>
 Metragem: ${metragemGaze.toFixed(2)} m<br><br>
 
-${modelo === "gazeForro" ? `
+${modelo==="gazeForro"?`
 <b>FORRO:</b><br>
-Alturas: ${
+Alturas: ${alturasForro}<br>
+Metragem: ${metragemForro.toFixed(2)} m<br><br>`:""}
+
+<b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
+<b>SEU LUCRO (mão de obra + instalação):</b> R$ ${(maoObra+instalacao).toFixed(2)}<br>
+
+<div class="final">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</div>
+`
+
+document.getElementById("materiaisDetalhe").innerHTML = `
+Gaze: ${metragemGaze.toFixed(2)} m<br>
+Forro: ${modelo==="gazeForro"?metragemForro.toFixed(2)+" m":"Não possui"}<br>
+Entretela: ${metragemGaze.toFixed(2)} m<br>
+Rodízios: 60 un<br>
+Trilho: ${largura} m
+`
+
+document.getElementById("orcamentoFinal").innerHTML = `
+Valor Final: R$ ${valorFinal.toFixed(2)}
+`
+}
+
+function gerarPDF(){
+window.print()
+}
+
+</script>
+
+</body>
+</html>
