@@ -3,39 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis</title>
+<title>Ateliê Patrícia Reis - Cálculo Técnico</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#ffffff;
-    text-align:center;
-    padding:40px;
+font-family:Arial, sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:20px;
 }
+
+.container{
+max-width:600px;
+margin:auto;
+background:#ffffff;
+padding:20px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
 h1{
-    color:#3b5fa0;
+text-align:center;
+color:#3b5fa0;
 }
-a{
-    display:block;
-    margin:20px auto;
-    padding:15px;
-    width:250px;
-    background:#3b5fa0;
-    color:white;
-    text-decoration:none;
-    border-radius:8px;
-    font-size:16px;
+
+input, select, button{
+width:100%;
+padding:10px;
+margin:8px 0;
+}
+
+button{
+background:#3b5fa0;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+.resultado{
+margin-top:20px;
+background:#f1f1f1;
+padding:15px;
+}
+
+.final{
+font-size:22px;
+font-weight:bold;
+margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Ateliê Patrícia Reis</h1>
+<div class="container">
+<h1>Cálculo Técnico</h1>
 
-<a href="tecnico.html">🔧 Cálculo Técnico</a>
-<a href="calculo.html">🧮 Cálculo Rápido</a>
-<a href="orcamento.html">📄 Orçamento Cliente</a>
+<label>Largura (m)</label>
+<input type="number" id="largura" step="0.01">
+
+<label>Altura (m)</label>
+<input type="number" id="altura" step="0.01">
+
+<label>Tipo de Tecido</label>
+<select id="tecido">
+<option value="gaze">Gaze (R$26)</option>
+<option value="microfibra">Microfibra (R$13)</option>
+<option value="black70">Blackout 70% (R$23)</option>
+<option value="black100">Blackout 100% (R$31)</option>
+</select>
+
+<label>Presilhas (manual)</label>
+<input type="number" id="presilhas" value="0">
+
+<label>Instalação</label>
+<input type="number" id="instalacao" value="0">
+
+<label>Desconto</label>
+<input type="number" id="desconto" value="0">
+
+<button onclick="calcular()">Calcular</button>
+
+<div id="resultado" class="resultado"></div>
+</div>
+
+<script>
+function calcular(){
+
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let tecido = document.getElementById("tecido").value;
+let presilhas = parseInt(document.getElementById("presilhas").value) || 0;
+let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
+let desconto = parseFloat(document.getElementById("desconto").value) || 0;
+
+let larguraRolo = 3;
+let fator = 3.5;
+let precoTecido = 26;
+
+if(tecido !== "gaze"){
+fator = 2;
+}
+
+if(tecido === "microfibra") precoTecido = 13;
+if(tecido === "black70") precoTecido = 23;
+if(tecido === "black100") precoTecido = 31;
+
+let totalLargura = largura * fator;
+let alturas = Math.ceil(totalLargura / larguraRolo);
+
+let metragem = alturas * altura;
+
+let rodizios = alturas * 30;
+let custoRodizio = rodizios * 0.12;
+let custoPresilha = presilhas * 1.60;
+let custoTrilho = largura * 15;
+
+let custoEntretela = 0;
+if(tecido === "gaze"){
+custoEntretela = metragem * 1.60;
+}
+
+let custoTecido = metragem * precoTecido;
+
+let custoTecnico = custoTecido + custoRodizio + custoPresilha + custoTrilho + custoEntretela;
+
+let valorVenda = largura * 150; 
+let lucro = valorVenda - custoTecnico;
+
+let valorFinal = valorVenda + instalacao - desconto;
+
+document.getElementById("resultado").innerHTML = `
+Alturas necessárias: ${alturas}<br>
+Metragem total: ${metragem.toFixed(2)} m<br>
+Rodízios: ${rodizios}<br><br>
+
+Custo Tecido: R$ ${custoTecido.toFixed(2)}<br>
+Custo Entretela: R$ ${custoEntretela.toFixed(2)}<br>
+Custo Rodízio: R$ ${custoRodizio.toFixed(2)}<br>
+Custo Presilha: R$ ${custoPresilha.toFixed(2)}<br>
+Custo Trilho: R$ ${custoTrilho.toFixed(2)}<br><br>
+
+<b>CUSTO TÉCNICO: R$ ${custoTecnico.toFixed(2)}</b><br>
+Lucro: R$ ${lucro.toFixed(2)}<br><br>
+
+<div class="final">
+VALOR FINAL: R$ ${valorFinal.toFixed(2)}
+</div>
+`;
+}
+</script>
 
 </body>
 </html>
