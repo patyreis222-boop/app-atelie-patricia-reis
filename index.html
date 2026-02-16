@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BP Confecções - Orçamento</title>
+<title>Ateliê Patrícia Reis - Orçamento</title>
 
 <style>
 body{
@@ -13,29 +13,30 @@ body{
     padding:20px;
 }
 .container{
-    max-width:500px;
+    max-width:600px;
     margin:auto;
 }
-h2{
+h1{
     text-align:center;
+    color:#3b5fa0;
 }
-input, select, button{
+input, select{
     width:100%;
     padding:10px;
-    margin-bottom:10px;
-    border:1px solid #ccc;
-    border-radius:6px;
+    margin-bottom:12px;
 }
 button{
-    background:#1f3c88;
+    width:100%;
+    padding:12px;
+    background:#3b5fa0;
     color:white;
-    font-weight:bold;
+    border:none;
+    font-size:16px;
 }
-.result{
-    background:#f4f6fb;
+.resultado{
+    margin-top:20px;
     padding:15px;
-    border-radius:8px;
-    margin-top:15px;
+    background:#f2f4f8;
 }
 .final{
     font-size:22px;
@@ -46,9 +47,8 @@ button{
 </head>
 
 <body>
-
 <div class="container">
-<h2>BP Confecções</h2>
+<h1>Orçamento</h1>
 
 <label>Largura (m)</label>
 <input type="number" id="largura" step="0.01">
@@ -58,8 +58,8 @@ button{
 
 <label>Tipo</label>
 <select id="tipo">
-<option value="sem">Sem forro</option>
-<option value="com">Com forro</option>
+<option value="sem">Sem Forro</option>
+<option value="com">Com Forro</option>
 </select>
 
 <label>Valor metro linear SEM forro</label>
@@ -68,19 +68,20 @@ button{
 <label>Valor metro linear COM forro</label>
 <input type="number" id="valorCom" value="200">
 
-<label>Valor instalação</label>
+<label>Valor instalação (opcional)</label>
 <input type="number" id="instalacao" value="0">
 
-<label>Desconto</label>
+<label>Desconto (R$)</label>
 <input type="number" id="desconto" value="0">
 
 <button onclick="calcular()">Calcular</button>
 
-<div class="result" id="resultado" style="display:none;"></div>
+<div class="resultado" id="resultado" style="display:none;"></div>
 
 </div>
 
 <script>
+
 function calcular(){
 
 let largura = parseFloat(document.getElementById("largura").value);
@@ -96,61 +97,35 @@ if(!largura || !altura){
     return;
 }
 
-// ===== CÁLCULO TÉCNICO =====
+/* === CÁLCULO TÉCNICO === */
 
-// Alturas necessárias
-let alturas = Math.ceil((largura * 3.5) / 3);
+// franzimento
+let fator = (tipo === "com") ? 2 : 3.5;
 
-// Consumo tecido principal
-let alturaReal = altura + 0.12 + 0.32;
-let consumoPrincipal = alturas * alturaReal;
+// alturas necessárias
+let alturas = Math.ceil((largura * fator) / 3);
 
-// Forro
-let consumoForro = 0;
-if(tipo === "com"){
-    consumoForro = (largura * 2) * alturaReal;
-}
+// metragem total
+let metragemTotal = alturas * (altura + 0.44);
 
-// Rodízios
+// rodízios (1 a cada 10cm)
 let rodizios = Math.ceil((largura * 100) / 10);
 if(tipo === "com"){
     rodizios = rodizios * 2;
 }
 
-// Entretela e presilha entram no custo técnico (simples exemplo fixo)
-let custoEntretela = consumoPrincipal * 5;
-let custoPresilha = rodizios * 0.5;
+// preço venda por metro linear
+let valorMetro = (tipo === "com") ? valorCom : valorSem;
+let valorVenda = largura * valorMetro;
 
-// Mão de obra estimada
-let maoObra = largura * 50;
-
-// Custo técnico total
-let custoTecnico = consumoPrincipal*30 + consumoForro*25 + custoEntretela + custoPresilha + maoObra;
-
-// ===== VALOR DE VENDA FIXO =====
-let valorVenda = 0;
-
-if(tipo === "sem"){
-    valorVenda = largura * valorSem;
-}else{
-    valorVenda = largura * valorCom;
-}
-
-// Valor final
+// valor final
 let valorFinal = valorVenda + instalacao - desconto;
 
-// Lucro
-let lucro = valorVenda - custoTecnico;
-
-// Mostrar resultado
 let resultado = document.getElementById("resultado");
 resultado.style.display = "block";
 resultado.innerHTML = `
-<b>Cálculo Técnico:</b><br>
 Alturas necessárias: ${alturas} un<br>
 Rodízios: ${rodizios} un<br>
-Custo técnico estimado: R$ ${custoTecnico.toFixed(2)}<br>
-Lucro estimado: R$ ${lucro.toFixed(2)}<br>
 
 <div class="final">
 VALOR FINAL: R$ ${valorFinal.toFixed(2)}
@@ -158,7 +133,7 @@ VALOR FINAL: R$ ${valorFinal.toFixed(2)}
 `;
 
 }
-</script>
 
+</script>
 </body>
 </html>
