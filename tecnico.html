@@ -11,7 +11,7 @@ input,select,button{width:100%;margin-bottom:10px;padding:8px;}
 </head>
 <body>
 
-<h2>Cálculo Técnico</h2>
+<h2>Cálculo Técnico - Ateliê Patrícia Reis</h2>
 
 <label>Largura (m)</label>
 <input type="number" id="largura" step="0.01">
@@ -19,10 +19,15 @@ input,select,button{width:100%;margin-bottom:10px;padding:8px;}
 <label>Altura (m)</label>
 <input type="number" id="altura" step="0.01">
 
-<label>Tipo</label>
+<label>Barra (cm)</label>
+<input type="number" id="barra" value="32">
+
+<label>Tipo de Forro</label>
 <select id="tipo">
-<option value="sem">Sem forro</option>
-<option value="com">Com forro</option>
+<option value="sem">Sem Forro</option>
+<option value="micro">Microfibra</option>
+<option value="70">Blackout 70%</option>
+<option value="100">Blackout 100%</option>
 </select>
 
 <label>Presilhas (manual)</label>
@@ -43,41 +48,87 @@ function calcular(){
 
 let largura = parseFloat(document.getElementById("largura").value);
 let altura = parseFloat(document.getElementById("altura").value);
+let barra = parseFloat(document.getElementById("barra").value)/100;
 let tipo = document.getElementById("tipo").value;
 let presilhas = parseFloat(document.getElementById("presilhas").value);
 let instalacao = parseFloat(document.getElementById("instalacao").value);
 let desconto = parseFloat(document.getElementById("desconto").value);
 
-let fator = (tipo === "com") ? 2 : 3.5;
+// PREÇOS
+let precoGaze = 26;
+let precoMicro = 13;
+let preco70 = 23;
+let preco100 = 31;
+let precoEntretela = 1.60;
+let precoRodizio = 0.12;
+let precoPresilha = 1.60;
+let precoTrilho = 15;
 
-let alturas = Math.ceil((largura * fator) / 3);
-let metragemGaze = alturas * (altura + 0.44);
+// === ALTURA REAL ===
+let alturaReal = altura + 0.12 + barra;
 
-let rodizios = Math.ceil((largura * 100) / 10);
-if(tipo === "com"){ rodizios = rodizios * 2; }
+// === GAZE ===
+let alturasGaze = Math.ceil((largura * 3.5) / 3);
+let metragemGaze = alturasGaze * alturaReal;
+let custoGaze = metragemGaze * precoGaze;
 
-let custoEntretela = metragemGaze * 2;
-let custoRodizio = rodizios * 0.15;
-let custoPresilha = presilhas * 2;
+// === ENTRETELA ===
+let custoEntretela = metragemGaze * precoEntretela;
 
-let custoTecnico = custoEntretela + custoRodizio + custoPresilha;
+// === FORRO ===
+let metragemForro = 0;
+let custoForro = 0;
 
-let valorVenda = (tipo === "com") ? largura*200 : largura*150;
+if(tipo !== "sem"){
+    let alturasForro = Math.ceil((largura * 2) / 3);
+    metragemForro = alturasForro * alturaReal;
+
+    if(tipo === "micro") custoForro = metragemForro * precoMicro;
+    if(tipo === "70") custoForro = metragemForro * preco70;
+    if(tipo === "100") custoForro = metragemForro * preco100;
+}
+
+// === RODÍZIOS ===
+let rodizios = Math.ceil(largura * 10);
+if(tipo !== "sem"){ rodizios *= 2; }
+let custoRodizios = rodizios * precoRodizio;
+
+// === PRESILHAS ===
+let custoPresilhas = presilhas * precoPresilha;
+
+// === TRILHO ===
+let custoTrilho = largura * precoTrilho;
+
+// === CUSTO TÉCNICO TOTAL ===
+let custoTecnico =
+custoGaze +
+custoEntretela +
+custoForro +
+custoRodizios +
+custoPresilhas +
+custoTrilho;
+
+// === VALOR VENDA BASE ===
+let valorVenda = (tipo === "sem") ? largura * 150 : largura * 200;
+
+// === VALOR FINAL ===
 let valorFinal = valorVenda + instalacao - desconto;
 
+// === LUCRO ===
 let lucro = valorVenda - custoTecnico;
 
 document.getElementById("resultado").innerHTML = `
-Alturas: ${alturas}<br>
-Metragem Gaze: ${metragemGaze.toFixed(2)} m<br>
-Rodízios: ${rodizios}<br>
-Custo Técnico: R$ ${custoTecnico.toFixed(2)}<br>
-Lucro: R$ ${lucro.toFixed(2)}<br><br>
-<b>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</b>
+<b>Alturas Gaze:</b> ${alturasGaze}<br>
+<b>Metragem Gaze:</b> ${metragemGaze.toFixed(2)} m<br>
+<b>Metragem Forro:</b> ${metragemForro.toFixed(2)} m<br>
+<b>Rodízios:</b> ${rodizios}<br>
+<b>Custo Técnico Total:</b> R$ ${custoTecnico.toFixed(2)}<br>
+<b>Lucro (sem instalação):</b> R$ ${lucro.toFixed(2)}<br><br>
+<b>VALOR FINAL:</b> R$ ${valorFinal.toFixed(2)}
 `;
 
 }
 </script>
 
 </body>
-</html>
+</html> be
