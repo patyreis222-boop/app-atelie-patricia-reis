@@ -1,244 +1,217 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis - Sistema</title>
+<title>Ateliê Patrícia Reis</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#ffffff;
-    margin:0;
-    padding:20px;
-    color:#333;
-}
-
-.container{
-    max-width:900px;
-    margin:auto;
+font-family: Arial, sans-serif;
+background:#ffffff;
+margin:0;
+padding:20px;
 }
 
 .logo{
-    text-align:center;
-    margin-bottom:20px;
+text-align:center;
+margin-bottom:20px;
 }
 
 .logo img{
-    max-width:300px;
+max-width:300px;
 }
 
 .tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
+display:flex;
+gap:10px;
+margin-bottom:20px;
 }
 
 .tabs button{
-    flex:1;
-    padding:12px;
-    border:none;
-    background:#eaeaea;
-    cursor:pointer;
-    font-weight:bold;
+flex:1;
+padding:12px;
+border:none;
+background:#e5e5e5;
+cursor:pointer;
+font-weight:bold;
 }
 
 .tabs button.active{
-    background:#5b7fa6;
-    color:#fff;
+background:#5b7fa3;
+color:white;
 }
 
-.page{
-    display:none;
+.section{
+display:none;
 }
 
-.page.active{
-    display:block;
+.section.active{
+display:block;
 }
 
 input, select{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border-radius:6px;
-    border:1px solid #ccc;
+width:100%;
+padding:10px;
+margin-bottom:12px;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
-button.calc{
-    background:#5b7fa6;
-    color:#fff;
-    border:none;
-    padding:12px;
-    width:100%;
-    font-size:16px;
-    cursor:pointer;
-    margin-top:10px;
+button.calcular{
+width:100%;
+padding:14px;
+background:#5b7fa3;
+color:white;
+border:none;
+font-size:16px;
+cursor:pointer;
 }
 
-.result-box{
-    background:#f2f4f7;
-    padding:20px;
-    margin-top:20px;
-    border-radius:10px;
-}
-
-.final{
-    font-size:22px;
-    font-weight:bold;
-    margin-top:10px;
+.resultado{
+background:#f2f2f2;
+padding:15px;
+margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
 <div class="logo">
-    <img src="logo.png">
+<img src="logo.png">
 </div>
 
 <div class="tabs">
-    <button onclick="showPage('tecnico')" class="active">Cálculo Técnico</button>
-    <button onclick="showPage('materiais')">Materiais</button>
-    <button onclick="showPage('cliente')">Orçamento Cliente</button>
+<button onclick="mostrar(0)" class="active">TÉCNICO</button>
+<button onclick="mostrar(1)">MATERIAIS</button>
+<button onclick="mostrar(2)">ORÇAMENTO</button>
 </div>
 
-<!-- ================= TÉCNICO ================= -->
-<div id="tecnico" class="page active">
+<div class="section active">
 
 <h3>Dados</h3>
 
-<input type="number" id="largura" placeholder="Largura (m)">
-<input type="number" id="altura" placeholder="Altura (m)">
+<input id="largura" placeholder="Largura (m)">
+<input id="altura" placeholder="Altura (m)">
 
-<select id="modelo">
-<option value="gaze">Somente Gaze</option>
+<select id="modo">
+<option value="gaze">Só Gaze</option>
 <option value="gaze_forro">Gaze + Forro</option>
 </select>
 
-<select id="tipoForro">
-<option value="0">Sem Forro</option>
+<select id="forro">
 <option value="13">Microfibra (R$13)</option>
 <option value="23">Blackout 70% (R$23)</option>
 <option value="31">Blackout 100% (R$31)</option>
 </select>
 
-<input type="number" id="presilhas" placeholder="Presilhas (manual)" value="0">
-<input type="number" id="instalacao" placeholder="Instalação (R$)" value="0">
-<input type="number" id="desconto" placeholder="Desconto (R$)" value="0">
+<input id="presilhaManual" placeholder="Presilhas (manual)">
+<input id="instalacao" placeholder="Instalação (R$)">
+<input id="desconto" placeholder="Desconto (R$)">
 
-<button class="calc" onclick="calcular()">Calcular</button>
+<button class="calcular" onclick="calcular()">Calcular</button>
 
-<div id="resultadoTecnico" class="result-box"></div>
+<div class="resultado" id="resultado"></div>
+
 </div>
 
-<!-- ================= MATERIAIS ================= -->
-<div id="materiais" class="page">
-<h3>Quantidades Necessárias</h3>
-<div id="resultadoMateriais" class="result-box"></div>
+<div class="section">
+<div id="materiais"></div>
 </div>
 
-<!-- ================= CLIENTE ================= -->
-<div id="cliente" class="page">
-<h3>Orçamento</h3>
-
-<input type="text" id="nomeCliente" placeholder="Nome do Cliente">
-
-<div id="resultadoCliente" class="result-box"></div>
-</div>
-
+<div class="section">
+<div id="cliente"></div>
 </div>
 
 <script>
 
-function showPage(page){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+function mostrar(i){
+let tabs=document.querySelectorAll(".tabs button");
+let sec=document.querySelectorAll(".section");
 
-    document.getElementById(page).classList.add('active');
-    event.target.classList.add('active');
+tabs.forEach(t=>t.classList.remove("active"));
+sec.forEach(s=>s.classList.remove("active"));
+
+tabs[i].classList.add("active");
+sec[i].classList.add("active");
 }
 
 function calcular(){
 
-let largura = parseFloat(document.getElementById("largura").value);
-let altura = parseFloat(document.getElementById("altura").value);
-let modelo = document.getElementById("modelo").value;
-let tipoForro = parseFloat(document.getElementById("tipoForro").value);
-let presilhas = parseInt(document.getElementById("presilhas").value);
-let instalacao = parseFloat(document.getElementById("instalacao").value);
-let desconto = parseFloat(document.getElementById("desconto").value);
+let largura=parseFloat(document.getElementById("largura").value);
+let altura=parseFloat(document.getElementById("altura").value);
+let modo=document.getElementById("modo").value;
+let forroValor=parseFloat(document.getElementById("forro").value);
+let presilhaManual=parseFloat(document.getElementById("presilhaManual").value||0);
+let instalacao=parseFloat(document.getElementById("instalacao").value||0);
+let desconto=parseFloat(document.getElementById("desconto").value||0);
 
-let fatorGaze = 3.5;
-let fatorForro = 2;
+let gazePreco=26;
+let entretelaPreco=1.60;
+let rodizioPreco=0.12;
+let presilhaPreco=1.60;
+let trilhoPreco=15;
 
-let alturasGaze = Math.ceil((largura * fatorGaze) / 3);
-let alturasForro = Math.ceil((largura * fatorForro) / 3);
+let maoObra = (modo=="gaze") ? largura*150 : largura*200;
 
-let metragemGaze = alturasGaze * (altura + 0.44);
-let metragemForro = alturasForro * (altura + 0.44);
+let alturasGaze=Math.ceil((largura*2)/1.40);
+let metragemGaze=alturasGaze*altura;
 
-let custoGaze = metragemGaze * 26;
-let custoForro = metragemForro * tipoForro;
+let alturasForro= (modo=="gaze_forro") ? Math.ceil(largura/1.40) : 0;
+let metragemForro=alturasForro*altura;
 
-let entretela = metragemGaze;
-let custoEntretela = entretela * 1.60;
+let rodizios=Math.ceil(largura*20);
 
-let rodizios = Math.ceil((largura * 100) / 10);
-if(modelo === "gaze_forro"){ rodizios *= 2; }
+let custoMateriais=
+(metragemGaze*gazePreco)+
+(metragemForro*forroValor)+
+(metragemGaze*entretelaPreco)+
+(rodizios*rodizioPreco)+
+(presilhaManual*presilhaPreco)+
+(largura*trilhoPreco);
 
-let custoRodizio = rodizios * 0.12;
-let custoPresilha = presilhas * 1.60;
-let custoTrilho = largura * 15;
+let valorFinal=custoMateriais+maoObra+instalacao-desconto;
 
-let maoDeObra = largura * (modelo === "gaze_forro" ? 200 : 150);
+let lucro=maoObra+instalacao;
 
-let custoTecnico = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
-
-let valorFinal = maoDeObra + instalacao - desconto;
-let lucro = valorFinal - custoTecnico;
-
-document.getElementById("resultadoTecnico").innerHTML = `
-<b>GAZE</b><br>
+document.getElementById("resultado").innerHTML=`
+<b>GAZE:</b><br>
 Alturas: ${alturasGaze}<br>
 Metragem: ${metragemGaze.toFixed(2)} m<br><br>
 
-<b>FORRO</b><br>
-Alturas: ${modelo==="gaze_forro"?alturasForro:0}<br>
-Metragem: ${modelo==="gaze_forro"?metragemForro.toFixed(2):0} m<br><br>
+<b>FORRO:</b><br>
+Alturas: ${alturasForro}<br>
+Metragem: ${metragemForro.toFixed(2)} m<br><br>
 
 Rodízios: ${rodizios}<br>
-Entretela: ${entretela.toFixed(2)} m<br>
-Trilho: ${largura} m<br>
-Mão de obra: R$ ${maoDeObra.toFixed(2)}<br><br>
+Entretela: ${metragemGaze.toFixed(2)} m<br>
+Trilho: ${largura} m<br><br>
 
-<b>CUSTO TÉCNICO:</b> R$ ${custoTecnico.toFixed(2)}<br>
-Lucro: R$ ${lucro.toFixed(2)}<br>
-
-<div class="final">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</div>
+<b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
+<b>SEU LUCRO (mão de obra + instalação):</b> R$ ${lucro.toFixed(2)}<br>
+<br>
+<h2>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
 `;
 
-document.getElementById("resultadoMateriais").innerHTML = `
+document.getElementById("materiais").innerHTML=`
+<h3>Resumo Materiais</h3>
 Gaze: ${metragemGaze.toFixed(2)} m<br>
-Forro: ${modelo==="gaze_forro"?metragemForro.toFixed(2):0} m<br>
+Forro: ${metragemForro.toFixed(2)} m<br>
+Entretela: ${metragemGaze.toFixed(2)} m<br>
 Rodízios: ${rodizios}<br>
-Entretela: ${entretela.toFixed(2)} m<br>
 Trilho: ${largura} m<br>
-Presilhas: ${presilhas}
+Presilhas: ${presilhaManual}<br>
+<br>
+Total Materiais: R$ ${custoMateriais.toFixed(2)}
 `;
 
-document.getElementById("resultadoCliente").innerHTML = `
-<b>Cliente:</b> ${document.getElementById("nomeCliente").value}<br><br>
-<div class="final">VALOR TOTAL: R$ ${valorFinal.toFixed(2)}</div><br>
-
-Forma de pagamento:<br>
-50% entrada + 50% na entrega<br>
-Pix disponível<br>
-Parcelamento até 3x com juros<br><br>
-
-Prazo: Sob consulta
+document.getElementById("cliente").innerHTML=`
+<h3>Orçamento</h3>
+Valor total do serviço: <b>R$ ${valorFinal.toFixed(2)}</b><br><br>
+Forma de pagamento: ___________________<br>
+Nome do cliente: ___________________
 `;
+
 }
 
 </script>
