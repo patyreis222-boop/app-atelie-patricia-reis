@@ -8,304 +8,171 @@
 <style>
 body{
 font-family: Arial, sans-serif;
-background:#ffffff;
+background:#f5f6f8;
 margin:0;
 padding:20px;
 }
+
 .container{
-max-width:800px;
+max-width:600px;
 margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.05);
 }
-.logo{
+
+h1{
 text-align:center;
-margin-bottom:20px;
+color:#5b7fa6;
 }
-.logo img{
-max-width:100%;
-height:120px;
-object-fit:contain;
-}
-.tabs{
-display:flex;
-gap:5px;
-margin-bottom:20px;
-}
-.tab{
-flex:1;
-padding:12px;
-background:#ddd;
-text-align:center;
-cursor:pointer;
-font-weight:bold;
-}
-.tab.active{
-background:#5f7ea3;
-color:white;
-}
-.section{
-display:none;
-}
-.section.active{
-display:block;
-}
-input, select{
+
+input, select, button{
 width:100%;
 padding:10px;
-margin:6px 0 15px;
-border-radius:8px;
+margin:6px 0;
+border-radius:6px;
 border:1px solid #ccc;
+font-size:14px;
 }
+
 button{
-width:100%;
-padding:14px;
-background:#5f7ea3;
+background:#5b7fa6;
 color:white;
 border:none;
-border-radius:10px;
-font-size:16px;
+font-weight:bold;
 cursor:pointer;
 }
-.result{
-background:#f2f2f2;
-padding:15px;
-border-radius:10px;
-margin-top:20px;
+
+button:hover{
+opacity:0.9;
 }
+
+.resultado{
+margin-top:20px;
+background:#f0f2f5;
+padding:15px;
+border-radius:8px;
+}
+
 .footer{
 text-align:center;
 margin-top:30px;
 font-size:12px;
-color:#888;
+color:#777;
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<div class="logo">
-<img src="logo.png">
-</div>
+<h1>ATELIÊ PATRÍCIA REIS</h1>
 
-<div class="tabs">
-<div class="tab active" onclick="showTab('tecnico')">TÉCNICO</div>
-<div class="tab" onclick="showTab('orcamento')">ORÇAMENTO</div>
-</div>
+<h3>Dados da Cortina</h3>
 
-<div id="tecnico" class="section active">
+<input type="number" id="largura" placeholder="Largura (m)">
+<input type="number" id="altura" placeholder="Altura (m)">
+<input type="number" id="barra" placeholder="Tamanho da Barra (m)">
 
-<label>Largura (m)</label>
-<input id="largura" type="number" step="0.01">
-
-<label>Altura (m)</label>
-<input id="altura" type="number" step="0.01">
-
-<label>Barra (m)</label>
-<input id="barra" type="number" step="0.01">
-
-<label>Modelo</label>
 <select id="modelo">
-<option value="gaze">Só Gaze</option>
-<option value="gazeForro">Gaze + Forro</option>
+<option value="Prega Macho">Prega Macho</option>
+<option value="Wave">Wave</option>
+<option value="Franzido">Franzido</option>
+<option value="Ilhós">Ilhós</option>
+<option value="Prega Americana">Prega Americana</option>
 </select>
 
-<label>Tipo de Forro</label>
 <select id="tipoForro">
-<option value="13">Microfibra</option>
-<option value="23">Blackout 70%</option>
 <option value="31">Blackout 100%</option>
+<option value="22">Microfibra</option>
+<option value="18">70%</option>
 </select>
 
-<label>Mão de obra (R$ por metro linear)</label>
-<input id="maoObra" type="number">
+<input type="number" id="presilha" placeholder="Presilhas (un)">
+<input type="number" id="instalacao" placeholder="Instalação (R$)">
+<input type="number" id="maoObra" placeholder="Mão de obra (R$/metro linear)">
 
 <button onclick="calcular()">Calcular</button>
 
-<div id="resultadoTecnico" class="result"></div>
-
-</div>
-
-<div id="orcamento" class="section">
-
-<label>Nome do Cliente</label>
-<input id="cliente">
-
-<button onclick="gerarPDF()">Gerar PDF</button>
-
-<div id="resultadoOrcamento" class="result"></div>
-
-</div>
-
-<div class="footer">
-Ateliê Patrícia Reis • Sistema Interno
-</div>
+<div class="resultado" id="resultado"></div>
 
 </div>
 
 <script>
-
-let dadosGlobais = {};
-
-function showTab(id){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-event.target.classList.add('active');
-}
-
 function calcular(){
 
-let largura = parseFloat(document.getElementById("largura").value) || 0;
-let altura = parseFloat(document.getElementById("altura").value) || 0;
-let barra = parseFloat(document.getElementById("barra").value) || 0;
-let modelo = document.getElementById("modelo").value;
-let tipoForro = parseFloat(document.getElementById("tipoForro").value);
-let maoObraMetro = parseFloat(document.getElementById("maoObra").value) || 0;
+const largura = parseFloat(document.getElementById("largura").value) || 0;
+const altura = parseFloat(document.getElementById("altura").value) || 0;
+const barra = parseFloat(document.getElementById("barra").value) || 0;
+const modelo = document.getElementById("modelo").value;
+const valorForro = parseFloat(document.getElementById("tipoForro").value) || 0;
+const presilhas = parseInt(document.getElementById("presilha").value) || 0;
+const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
+const maoObraMetro = parseFloat(document.getElementById("maoObra").value) || 0;
 
-let cabecalho = 0.12;
-let larguraTecido = 3;
+const larguraTecido = 3;
+const cabecalho = 0.12;
+const valorGaze = 28;
+const valorRodizio = 1;
+const valorPresilha = 2;
+const valorTrilho = 45;
 
-let alturaTotal = altura + cabecalho + barra;
+const alturaFinal = altura + cabecalho + barra;
 
-let alturasGaze = Math.ceil((largura*3.5)/larguraTecido);
-let metragemGaze = alturasGaze * alturaTotal;
+const alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
+const alturasForro = Math.ceil((largura * 2) / larguraTecido);
 
-let alturasForro = 0;
-let metragemForro = 0;
+const metragemGaze = alturasGaze * alturaFinal;
+const metragemForro = alturasForro * alturaFinal;
 
-if(modelo=="gazeForro"){
-alturasForro = Math.ceil((largura*2)/larguraTecido);
-metragemForro = alturasForro * alturaTotal;
+const rodizios = Math.ceil(largura * 20);
+
+const custoGaze = metragemGaze * valorGaze;
+const custoForro = metragemForro * valorForro;
+const custoRodizios = rodizios * valorRodizio;
+const custoPresilhas = presilhas * valorPresilha;
+const custoTrilho = largura * valorTrilho;
+
+const custoMateriais = custoGaze + custoForro + custoRodizios + custoPresilhas + custoTrilho;
+
+const maoObraTotal = largura * maoObraMetro;
+
+const valorFinal = custoMateriais + maoObraTotal + instalacao;
+
+document.getElementById("resultado").innerHTML = `
+<h3>DETALHAMENTO TÉCNICO</h3>
+
+<b>Modelo:</b> ${modelo}<br><br>
+
+<b>GAZE</b><br>
+Alturas: ${alturasGaze}<br>
+Metragem: ${metragemGaze.toFixed(2)} m<br>
+Custo: R$ ${custoGaze.toFixed(2)}<br><br>
+
+<b>FORRO</b><br>
+Alturas: ${alturasForro}<br>
+Metragem: ${metragemForro.toFixed(2)} m<br>
+Custo: R$ ${custoForro.toFixed(2)}<br><br>
+
+Rodízios: ${rodizios} un — R$ ${custoRodizios.toFixed(2)}<br>
+Presilhas: ${presilhas} un — R$ ${custoPresilhas.toFixed(2)}<br>
+Trilho: ${largura} m — R$ ${custoTrilho.toFixed(2)}<br><br>
+
+<b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
+<b>SEU LUCRO (mão de obra + instalação):</b> R$ ${(maoObraTotal+instalacao).toFixed(2)}<br>
+
+<h2>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
+`;
 }
-
-let custoMateriais =
-(metragemGaze*26) +
-(metragemForro*tipoForro);
-
-let lucro = (largura*maoObraMetro);
-
-let valorFinal = custoMateriais + lucro;
-
-dadosGlobais = {
-largura, altura, barra,
-valorFinal
-};
-
-document.getElementById("resultadoTecnico").innerHTML =
-`Valor estimado: R$ ${valorFinal.toFixed(2)}`;
-
-document.getElementById("resultadoOrcamento").innerHTML =
-`Valor Final: R$ ${valorFinal.toFixed(2)}`;
-}
-
-function gerarPDF(){
-
-let cliente = document.getElementById("cliente").value || "Cliente";
-let hoje = new Date();
-let data = hoje.toLocaleDateString("pt-BR");
-
-let validade = new Date();
-validade.setDate(validade.getDate()+7);
-let validadeFormatada = validade.toLocaleDateString("pt-BR");
-
-let janela = window.open('');
-
-janela.document.write(`
-<html>
-<head>
-<style>
-body{
-font-family: Arial;
-padding:60px;
-color:#2c2c2c;
-background:white;
-}
-body::before{
-content:"";
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%, -50%);
-background:url('logo.png') no-repeat center;
-background-size:400px;
-opacity:0.05;
-width:100%;
-height:100%;
-z-index:-1;
-}
-h1{
-color:#5f7ea3;
-text-align:center;
-letter-spacing:2px;
-}
-.section{
-margin-top:25px;
-line-height:1.8;
-}
-.valor{
-margin-top:40px;
-font-size:26px;
-font-weight:bold;
-}
-.assinatura{
-margin-top:80px;
-text-align:center;
-}
-.linha{
-margin-top:60px;
-border-top:1px solid #000;
-width:300px;
-margin-left:auto;
-margin-right:auto;
-}
-.footer{
-margin-top:60px;
-font-size:12px;
-text-align:center;
-border-top:1px solid #ddd;
-padding-top:10px;
-}
-</style>
-</head>
-<body>
-
-<h1>ATELIÊ PATRÍCIA REIS</h1>
-
-<div class="section">
-<b>Cliente:</b> ${cliente}<br>
-<b>Data do orçamento:</b> ${data}<br>
-<b>Validade da proposta:</b> até ${validadeFormatada}
-</div>
-
-<div class="section">
-Conforme especificações técnicas acordadas.
-Instalação inclusa.
-Pagamento: 60% de entrada e 40% na entrega.
-Prazo estimado: até 15 dias úteis após confirmação da entrada.
-</div>
-
-<div class="valor">
-VALOR TOTAL: R$ ${dadosGlobais.valorFinal.toFixed(2)}
-</div>
-
-<div class="assinatura">
-<div class="linha"></div>
-Assinatura do Cliente
-</div>
+</script>
 
 <div class="footer">
-Telefone: 16 99428-4571<br>
-Instagram: @ateliepatriciareiss
+Telefone: (16) 99428-4571<br>
+Instagram: @ateliepatriciareiss<br>
+Proposta válida por 7 dias.
 </div>
-
-</body>
-</html>
-`);
-
-janela.print();
-}
-
-</script>
 
 </body>
 </html>
