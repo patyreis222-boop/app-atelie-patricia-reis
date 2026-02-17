@@ -15,7 +15,7 @@ body{
   padding:20px;
 }
 .container{
-  max-width:800px;
+  max-width:900px;
   margin:auto;
 }
 h1{
@@ -48,12 +48,10 @@ button{
   font-size:14px;
   line-height:1.7;
 }
-.bloco{
-  margin-bottom:15px;
-}
 .titulo{
   font-weight:bold;
   color:#5f7fa6;
+  margin-top:15px;
 }
 </style>
 </head>
@@ -89,12 +87,17 @@ button{
 </select>
 
 <input id="presilhas" placeholder="Presilhas (un)">
-<input id="maoObra" placeholder="Mão de Obra">
-<input id="instalacao" placeholder="Instalação">
+<input id="instalacao" placeholder="Instalação (R$)">
+
+<h3>Mão de Obra (valor por metro linear)</h3>
+<input id="maoSemForro" value="150" placeholder="Valor sem forro">
+<input id="maoComForro" value="200" placeholder="Valor com forro">
 
 <button onclick="calcular()">Calcular</button>
 
 <div id="resultado" class="resultado"></div>
+
+<hr>
 
 <h2>Orçamento para Cliente</h2>
 <input id="cliente" placeholder="Nome do Cliente">
@@ -120,16 +123,20 @@ function calcular(){
   const valorForroMetro = parseFloat(document.getElementById("forro").value);
 
   const presilhas = parseInt(document.getElementById("presilhas").value) || 0;
-  const maoObra = parseFloat(document.getElementById("maoObra").value) || 0;
   const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
+
+  const maoSemForro = parseFloat(document.getElementById("maoSemForro").value) || 0;
+  const maoComForro = parseFloat(document.getElementById("maoComForro").value) || 0;
 
   const larguraTecido = 3;
   const cabecalho = 0.12;
   const alturaFinal = altura + cabecalho + (barraCM/100);
 
+  // GAZE
   const alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
   const metragemGaze = alturasGaze * alturaFinal;
 
+  // FORRO
   let alturasForro = 0;
   let metragemForro = 0;
 
@@ -138,6 +145,7 @@ function calcular(){
     metragemForro = alturasForro * alturaFinal;
   }
 
+  // PREÇOS FIXOS
   const precoGaze = 26;
   const precoEntretela = 1.60;
   const precoRodizio = 0.12;
@@ -157,8 +165,16 @@ function calcular(){
 
   const custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
 
-  const totalProjeto = custoMateriais + maoObra + instalacao;
+  // MÃO DE OBRA POR METRO LINEAR
+  let maoObraCalculada = 0;
 
+  if(valorForroMetro !== 0){
+    maoObraCalculada = largura * maoComForro;
+  } else {
+    maoObraCalculada = largura * maoSemForro;
+  }
+
+  const totalProjeto = custoMateriais + maoObraCalculada + instalacao;
   valorFinalGlobal = totalProjeto;
 
   dadosPDF = {
@@ -171,43 +187,33 @@ function calcular(){
   };
 
   document.getElementById("resultado").innerHTML = `
-  <div class="bloco">
-    <div class="titulo">ALTURA FINAL</div>
-    Altura base: ${altura.toFixed(2)} m<br>
-    Barra: ${(barraCM/100).toFixed(2)} m<br>
-    Cabeçalho: 0.12 m<br>
-    <b>Altura final de corte: ${alturaFinal.toFixed(2)} m</b>
-  </div>
+  <div class="titulo">ALTURA FINAL</div>
+  Altura base: ${altura.toFixed(2)} m<br>
+  Barra: ${(barraCM/100).toFixed(2)} m<br>
+  Cabeçalho: 0.12 m<br>
+  <b>Altura final de corte: ${alturaFinal.toFixed(2)} m</b><br>
 
-  <div class="bloco">
-    <div class="titulo">GAZE</div>
-    Alturas: ${alturasGaze}<br>
-    Metragem: ${metragemGaze.toFixed(2)} m<br>
-    Valor: R$ ${custoGaze.toFixed(2)}
-  </div>
+  <div class="titulo">GAZE</div>
+  Alturas: ${alturasGaze}<br>
+  Metragem: ${metragemGaze.toFixed(2)} m<br>
+  Valor: R$ ${custoGaze.toFixed(2)}<br>
 
-  <div class="bloco">
-    <div class="titulo">FORRO</div>
-    Alturas: ${alturasForro}<br>
-    Metragem: ${metragemForro.toFixed(2)} m<br>
-    Valor: R$ ${custoForro.toFixed(2)}
-  </div>
+  <div class="titulo">FORRO</div>
+  Alturas: ${alturasForro}<br>
+  Metragem: ${metragemForro.toFixed(2)} m<br>
+  Valor: R$ ${custoForro.toFixed(2)}<br>
 
-  <div class="bloco">
-    <div class="titulo">MATERIAIS</div>
-    Entretela: R$ ${custoEntretela.toFixed(2)}<br>
-    Rodízios: ${rodizios} un → R$ ${custoRodizio.toFixed(2)}<br>
-    Presilhas: ${presilhas} un → R$ ${custoPresilha.toFixed(2)}<br>
-    Trilho: R$ ${custoTrilho.toFixed(2)}<br><br>
-    <b>Custo Total Materiais: R$ ${custoMateriais.toFixed(2)}</b>
-  </div>
+  <div class="titulo">MATERIAIS</div>
+  Entretela: R$ ${custoEntretela.toFixed(2)}<br>
+  Rodízios: ${rodizios} un → R$ ${custoRodizio.toFixed(2)}<br>
+  Presilhas: ${presilhas} un → R$ ${custoPresilha.toFixed(2)}<br>
+  Trilho: R$ ${custoTrilho.toFixed(2)}<br>
+  <b>Custo Total Materiais: R$ ${custoMateriais.toFixed(2)}</b><br>
 
-  <div class="bloco">
-    <div class="titulo">FINANCEIRO</div>
-    Mão de Obra: R$ ${maoObra.toFixed(2)}<br>
-    Instalação: R$ ${instalacao.toFixed(2)}<br><br>
-    <h3>Total do Projeto: R$ ${totalProjeto.toFixed(2)}</h3>
-  </div>
+  <div class="titulo">FINANCEIRO</div>
+  Mão de Obra: R$ ${maoObraCalculada.toFixed(2)}<br>
+  Instalação: R$ ${instalacao.toFixed(2)}<br>
+  <h3>Total do Projeto: R$ ${totalProjeto.toFixed(2)}</h3>
   `;
 }
 
