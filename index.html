@@ -245,17 +245,70 @@ doc.text(
 { maxWidth: 170 }
 );
 
-// LINHAS DE ASSINATURA
-doc.line(20, 150, 90, 150);
-doc.line(120, 150, 190, 150);
+// NOVA PÁGINA PARA ASSINATURAS
+doc.addPage();
 
+// TÍTULO DA PÁGINA 2
+doc.setFontSize(16);
+doc.setTextColor("#6f8fb3");
+doc.text("CONDIÇÕES CONTRATUAIS", 105, 25, { align: "center" });
+
+doc.setFontSize(11);
+doc.setTextColor("#000");
+
+doc.text(
+"1. A confecção terá início após confirmação do pagamento da entrada.",
+20,
+45,
+{ maxWidth: 170 }
+);
+
+doc.text(
+"2. O prazo estimado é de até 15 dias úteis após confirmação da entrada.",
+20,
+55,
+{ maxWidth: 170 }
+);
+
+doc.text(
+"3. Alterações após início da produção poderão gerar custos adicionais.",
+20,
+65,
+{ maxWidth: 170 }
+);
+
+doc.text(
+"4. Produto confeccionado sob medida não possui troca.",
+20,
+75,
+{ maxWidth: 170 }
+);
+
+// LINHA DIVISÓRIA
+doc.setDrawColor(180);
+doc.line(20, 95, 190, 95);
+
+// BLOCO DE ASSINATURAS CENTRALIZADO
+doc.setDrawColor(0);
+
+// LINHAS
+doc.line(35, 130, 85, 130);
+doc.line(120, 130, 170, 130);
+
+// NOMES
 doc.setFontSize(10);
 
-doc.text("Patrícia Reis", 20, 158);
-doc.text("Ateliê Patrícia Reis", 20, 164);
+doc.text("Patrícia Reis", 60, 138, { align: "center" });
+doc.text("Ateliê Patrícia Reis", 60, 144, { align: "center" });
 
-doc.text("Assinatura do Cliente", 120, 158);
-doc.text("Data: ____ / ____ / ______", 120, 164);
+doc.text("Assinatura do Cliente", 145, 138, { align: "center" });
+doc.text("Data: ____ / ____ / ______", 145, 144, { align: "center" });
+
+// RODAPÉ
+doc.setFontSize(9);
+doc.setTextColor("#666");
+doc.text("Franca - São Paulo", 105, 285, { align: "center" });
+doc.text("WhatsApp: (seu número aqui)  |  @seuinstagram", 105, 290, { align: "center" });
 
 doc.save("proposta.pdf");
 }
