@@ -189,8 +189,18 @@ const { jsPDF } = window.jspdf;
 let doc = new jsPDF();
 
 let cliente = document.getElementById("cliente").value;
-let entrada = document.getElementById("entrada").value;
-let restante = document.getElementById("restante").value;
+let entradaPerc = parseFloat(document.getElementById("entrada").value) || 0;
+let restantePerc = parseFloat(document.getElementById("restante").value) || 0;
+
+let total = dadosCalculo.totalProjeto;
+
+let valorEntrada = total * (entradaPerc / 100);
+let valorRestante = total * (restantePerc / 100);
+
+// FORMATAÇÃO BR
+function formatar(valor){
+  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 doc.setFontSize(20);
 doc.setTextColor("#6f8fb3");
@@ -219,7 +229,7 @@ doc.text("VALOR TOTAL DO PROJETO",105,145,{align:"center"});
 
 doc.setFontSize(22);
 doc.setTextColor("#000");
-doc.text(`R$ ${dadosCalculo.totalProjeto.toFixed(2)}`,105,158,{align:"center"});
+doc.text(formatar(total),105,158,{align:"center"});
 
 doc.line(40,165,170,165);
 
@@ -237,8 +247,8 @@ doc.setTextColor("#000");
 
 let y2=45;
 
-doc.text(`${entrada}% de entrada para início da confecção.`,20,y2); y2+=7;
-doc.text(`${restante}% na entrega e instalação.`,20,y2); y2+=7;
+doc.text(`Entrada (${entradaPerc}%): ${formatar(valorEntrada)}`,20,y2); y2+=7;
+doc.text(`Entrega (${restantePerc}%): ${formatar(valorRestante)}`,20,y2); y2+=7;
 doc.text("Aceitamos Pix, dinheiro e cartão de crédito em até 3x com juros.",20,y2); y2+=15;
 doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,y2); y2+=7;
 doc.text("Validade desta proposta: 7 dias.",20,y2);
