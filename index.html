@@ -220,20 +220,12 @@ doc.text(`Tipo de Forro: ${dadosCalculo.tipoForroTexto}`,20,y); y+=7;
 doc.text(`Trilho: Trilho de teto`,20,y); y+=7;
 doc.text(`Medidas: ${dadosCalculo.largura}L x ${dadosCalculo.altura}A`,20,y); y+=7;
 doc.text(`Barra: ${dadosCalculo.barraCm} cm`,20,y);
+y += 12; // espaçamento maior depois da barra
 
-doc.line(40,130,170,130);
-
-doc.setFontSize(13);
-doc.setTextColor("#6f8fb3");
-doc.text("VALOR TOTAL DO PROJETO",105,145,{align:"center"});
-
-doc.setFontSize(22);
-doc.setTextColor("#000");
-doc.text(formatar(total),105,158,{align:"center"});
-
-// LINHA DIVISÓRIA E DECLARAÇÃO
-doc.setDrawColor(150);
-doc.line(20, 100, 190, 100);
+// Linha divisória elegante
+doc.setDrawColor(180);
+doc.line(20, y, 190, y);
+y += 10;
 
 doc.setFontSize(11);
 doc.setTextColor("#000");
@@ -241,7 +233,7 @@ doc.setTextColor("#000");
 doc.text(
 "Declaro estar de acordo com todas as especificações, valores e condições comerciais descritas neste documento.",
 20,
-115,
+y,
 { maxWidth: 170 }
 );
 
