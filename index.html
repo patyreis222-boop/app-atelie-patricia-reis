@@ -84,7 +84,6 @@ button{
 </select>
 
 <input id="presilhasQtd" placeholder="Quantidade de Presilhas">
-
 <input id="maoSemForro" placeholder="Mão de obra sem forro (metro linear)">
 <input id="maoComForro" placeholder="Mão de obra com forro (metro linear)">
 <input id="instalacao" placeholder="Valor instalação">
@@ -135,8 +134,8 @@ let valorForro = metragemForro * tipoForroValor;
 // ENTRETELA
 let valorEntretela = metragemGaze * 1.6;
 
-// RODÍZIOS
-let rodizios = temForro ? largura * 20 * 2 : largura * 20;
+// RODÍZIOS FIXOS
+let rodizios = temForro ? 60 : 30;
 let valorRodizios = rodizios * 0.12;
 
 // PRESILHAS
@@ -251,7 +250,7 @@ doc.text("Assinatura do Cliente",120,165);
 doc.setFontSize(9);
 doc.setTextColor("#777");
 doc.text("Franca – São Paulo",105,280,{align:"center"});
-doc.text("📱 16 99428-4571   |   📷 @ateliepatriciareiss",105,285,{align:"center"});
+doc.text("16 99428-4571  |  @ateliepatriciareiss",105,285,{align:"center"});
 
 doc.save("proposta.pdf");
 }
