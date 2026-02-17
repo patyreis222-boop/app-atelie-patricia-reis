@@ -10,7 +10,7 @@
 <style>
 body{
 font-family: Arial, sans-serif;
-background:#f5f6f8;
+background:#f4f6f9;
 margin:0;
 padding:20px;
 }
@@ -18,11 +18,10 @@ padding:20px;
 h1{
 text-align:center;
 color:#5f7fa3;
-letter-spacing:1px;
 }
 
 .container{
-max-width:600px;
+max-width:650px;
 margin:auto;
 }
 
@@ -49,23 +48,27 @@ margin-top:10px;
 .resultado{
 background:#e9edf2;
 padding:15px;
-border-radius:12px;
+border-radius:10px;
 margin-top:15px;
+font-size:14px;
+line-height:1.6;
 }
 
-.titulo-azul{
+.titulo{
 color:#5f7fa3;
 font-weight:bold;
 margin-top:20px;
 }
 
-.pagina{
-page-break-after: always;
-padding:40px;
+.page-break{
+page-break-before: always;
 }
 
-.assinaturas{
-page-break-before: always;
+#area-pdf{
+width:190mm;
+padding:15mm;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
 }
 
 .linha-azul{
@@ -80,20 +83,9 @@ margin:40px 0;
 }
 
 .valor-grande{
-font-size:28px;
+font-size:26px;
 font-weight:bold;
 margin-top:10px;
-}
-
-.assinatura-linha{
-margin-top:60px;
-display:flex;
-justify-content:space-between;
-}
-
-.assinatura-bloco{
-width:45%;
-text-align:center;
 }
 </style>
 </head>
@@ -130,36 +122,38 @@ text-align:center;
 
 <div id="resultado" class="resultado"></div>
 
-<h2 class="titulo-azul">ORÇAMENTO PARA CLIENTE</h2>
+<h2 class="titulo">ORÇAMENTO PARA CLIENTE</h2>
 <input id="cliente" placeholder="Nome do Cliente">
 <button onclick="gerarPDF()">Gerar PDF Profissional</button>
 
 </div>
 
 <script>
-let valorFinalGlobal = 0;
+
 let dadosPDF = {};
+let valorFinalGlobal = 0;
 
 function calcular(){
 
 const largura = parseFloat(document.getElementById("largura").value) || 0;
 const altura = parseFloat(document.getElementById("altura").value) || 0;
-const barra = parseFloat(document.getElementById("barra").value) || 0;
+const barraCM = parseFloat(document.getElementById("barra").value) || 0;
 const modelo = document.getElementById("modelo").value;
 const forro = document.getElementById("forro").value;
 const presilhas = parseInt(document.getElementById("presilhas").value) || 0;
 const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
 const maoObra = parseFloat(document.getElementById("maoObra").value) || 0;
 
-const larguraTecido = 3;
+const barra = barraCM / 100;
 const cabecalho = 0.12;
-const alturaTotal = altura + cabecalho + (barra/100);
+const larguraTecido = 3;
+const alturaFinal = altura + cabecalho + barra;
 
 const alturasGaze = Math.ceil((largura*3.5)/larguraTecido);
-const metragemGaze = alturasGaze * alturaTotal;
-
 const alturasForro = Math.ceil((largura*2)/larguraTecido);
-const metragemForro = alturasForro * alturaTotal;
+
+const metragemGaze = alturasGaze * alturaFinal;
+const metragemForro = alturasForro * alturaFinal;
 
 const precoGaze = 26;
 const precoEntretela = 1.60;
@@ -168,9 +162,9 @@ const precoPresilha = 1.60;
 const precoTrilho = 15;
 
 let precoForro = 0;
-if(forro === "Blackout 100%") precoForro = 31;
-if(forro === "Blackout 70%") precoForro = 23;
-if(forro === "Microfibra") precoForro = 13;
+if(forro==="Blackout 100%") precoForro=31;
+if(forro==="Blackout 70%") precoForro=23;
+if(forro==="Microfibra") precoForro=13;
 
 const custoGaze = metragemGaze * precoGaze;
 const custoForro = metragemForro * precoForro;
@@ -186,100 +180,90 @@ const valorFinal = custoMateriais + lucro;
 
 valorFinalGlobal = valorFinal;
 
-dadosPDF = {
-modelo,
-forro,
-largura,
-altura,
-barra,
-valorFinal
-};
+dadosPDF = {modelo,forro,largura,altura,barraCM};
 
 document.getElementById("resultado").innerHTML = `
+<b>METRAGEM GAZE:</b> ${metragemGaze.toFixed(2)} m (R$ ${custoGaze.toFixed(2)})<br>
+<b>METRAGEM FORRO:</b> ${metragemForro.toFixed(2)} m (R$ ${custoForro.toFixed(2)})<br>
+<b>ENTRETELA:</b> ${metragemGaze.toFixed(2)} m (R$ ${custoEntretela.toFixed(2)})<br>
+<b>RODÍZIOS:</b> ${rodizios} un (R$ ${custoRodizio.toFixed(2)})<br>
+<b>PRESILHAS:</b> ${presilhas} un (R$ ${custoPresilha.toFixed(2)})<br>
+<b>TRILHO:</b> ${largura.toFixed(2)} m (R$ ${custoTrilho.toFixed(2)})<br><br>
 <b>VALOR FINAL:</b> R$ ${valorFinal.toFixed(2)}
 `;
 }
 
 function gerarPDF(){
 
-if(valorFinalGlobal === 0){
-alert("Clique em calcular antes de gerar o PDF.");
+if(valorFinalGlobal===0){
+alert("Clique em calcular antes.");
 return;
 }
 
 const cliente = document.getElementById("cliente").value || "Cliente";
-const hoje = new Date().toLocaleDateString();
+const data = new Date().toLocaleDateString();
 
-const elemento = document.createElement("div");
+const area = document.createElement("div");
+area.id="area-pdf";
 
-elemento.innerHTML = `
-<div class="pagina">
+area.innerHTML = `
+<div>
 <div class="linha-azul"></div>
 
 <h2 style="text-align:center;color:#5f7fa3;">Ateliê Patrícia Reis</h2>
-<p>Cliente: ${cliente}</p>
-<p>Data: ${hoje}</p>
+<p><b>Cliente:</b> ${cliente}</p>
+<p><b>Data:</b> ${data}</p>
 
-<h3 class="titulo-azul">ESPECIFICAÇÕES DO PROJETO</h3>
+<h3 style="color:#5f7fa3;">ESPECIFICAÇÕES DO PROJETO</h3>
 <p>Modelo: ${dadosPDF.modelo}</p>
 <p>Tipo de Forro: ${dadosPDF.forro}</p>
 <p>Tipo de Trilho: Trilho de teto</p>
 <p>Largura: ${dadosPDF.largura.toFixed(2)}L</p>
 <p>Altura: ${dadosPDF.altura.toFixed(2)}A</p>
-<p>Barra: ${dadosPDF.barra} cm</p>
-
-<p>O valor apresentado contempla todos os materiais necessários para a confecção, conforme especificação técnica, assim como a instalação no local.</p>
+<p>Barra: ${dadosPDF.barraCM} cm</p>
 
 <div class="bloco-valor">
-<h3 class="titulo-azul">VALOR TOTAL DO PROJETO</h3>
+<h3 style="color:#5f7fa3;">VALOR TOTAL DO PROJETO</h3>
 <div class="valor-grande">R$ ${valorFinalGlobal.toFixed(2)}</div>
 <p>Valor referente à confecção e instalação, conforme especificação acima.</p>
 </div>
 
-<h3 class="titulo-azul">FORMA DE PAGAMENTO</h3>
-<p>60% de entrada para início da confecção<br>
-40% na entrega/instalação.</p>
+<h3 style="color:#5f7fa3;">FORMA DE PAGAMENTO</h3>
+<p>60% de entrada e 40% na entrega/instalação.</p>
 
-<h3 class="titulo-azul">PRAZOS</h3>
-<p>Prazo de confecção: até 15 dias úteis após confirmação da entrada.</p>
-<p>Validade deste orçamento: 7 dias.</p>
+<h3 style="color:#5f7fa3;">PRAZOS</h3>
+<p>Confecção: até 15 dias úteis após confirmação da entrada.</p>
+<p>Validade do orçamento: 7 dias.</p>
 
 </div>
 
-<div class="pagina assinaturas">
+<div class="page-break"></div>
+
+<div>
 <div class="linha-azul"></div>
-
 <h3 style="text-align:center;color:#5f7fa3;">ASSINATURAS</h3>
-
-<p>Declaro estar de acordo com as especificações e condições acima descritas.</p>
-
-<div class="assinatura-linha">
-<div class="assinatura-bloco">
 <br><br>
 _________________________<br>
 Patrícia Reis<br>
 Ateliê Patrícia Reis
-</div>
-
-<div class="assinatura-bloco">
-<br><br>
+<br><br><br>
 _________________________<br>
-Assinatura do Cliente<br>
-Data: ___/___/____
-</div>
-</div>
-
+Assinatura do Cliente
 </div>
 `;
 
-html2pdf().set({
-margin:0,
-filename:'Orçamento.pdf',
+const opt = {
+margin:10,
+filename:"Orcamento_Atelie_Patricia_Reis.pdf",
+image:{type:"jpeg",quality:0.98},
 html2canvas:{scale:2},
-jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-}).from(elemento).save();
+jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+pagebreak:{mode:["css"]}
+};
 
+html2pdf().set(opt).from(area).save();
 }
+
 </script>
 
 </body>
