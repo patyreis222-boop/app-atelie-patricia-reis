@@ -193,38 +193,34 @@ doc.text("ESPECIFICAÇÕES DO PROJETO",20,110);
 doc.setTextColor(0,0,0);
 doc.setFontSize(11);
 doc.text(`Modelo: ${window.modeloPDF}`,20,120);
-doc.text(`Largura: ${window.larguraPDF} m`,20,127);
-doc.text(`Altura: ${window.alturaPDF} m`,20,134);
-doc.text(`Barra: ${window.barraPDF} m`,20,141);
-doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,148);
-doc.text(`Instalação: Inclusa`,20,155);
+doc.text(`Tecido principal: Gaze de Linho`,20,127);
+doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,134);
+doc.text(`Tipo de Trilho: Trilho de teto`,20,141);
+doc.text(`Largura: ${window.larguraPDF} m`,20,148);
+doc.text(`Altura: ${window.alturaPDF} m`,20,155);
+doc.text(`Barra: ${window.barraPDF} m`,20,162);
+
+doc.text("O valor apresentado contempla todos os materiais necessários",20,175);
+doc.text("para a confecção, conforme especificação técnica,",20,182);
+doc.text("assim como a instalação no local.",20,189);
 
 doc.setFontSize(12);
 doc.setTextColor(63,95,134);
-doc.text("INVESTIMENTO",20,170);
+doc.text("INVESTIMENTO",20,205);
 
 doc.setFontSize(16);
 doc.setTextColor(0,0,0);
-doc.text(`R$ ${window.valorFinalPDF}`,105,182,{align:"center"});
+doc.text(`R$ ${window.valorFinalPDF}`,105,218,{align:"center"});
 
 doc.setFontSize(11);
-doc.setTextColor(0,0,0);
 
-doc.text("Forma de pagamento:",20,200);
-doc.text("60% de entrada para início da confecção",20,207);
-doc.text("40% na entrega/instalação.",20,214);
+doc.text("Forma de pagamento:",20,235);
+doc.text("60% de entrada para início da confecção",20,242);
+doc.text("40% na entrega/instalação.",20,249);
 
-doc.text("Prazo de confecção e entrega:",20,225);
-doc.text("Até 15 dias úteis para finalização e entrega,",20,232);
-doc.text("contados após a confirmação do pagamento da entrada.",20,239);
-
-doc.text("Validade da proposta: 7 dias.",20,250);
-
-doc.text("____________________________________",20,265);
-doc.text("Assinatura do Cliente",20,272);
-
-doc.text("____________________________________",120,265);
-doc.text("Patrícia Reis",135,272);
+doc.text("Prazo de confecção e entrega:",20,260);
+doc.text("Até 15 dias úteis para finalização e entrega,",20,267);
+doc.text("contados após a confirmação do pagamento da entrada.",20,274);
 
 doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
 
