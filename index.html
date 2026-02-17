@@ -9,7 +9,7 @@
 <style>
 body{font-family:Arial;margin:20px;background:#f8f9fb}
 h1{color:#6f8fb3}
-input,select{padding:6px;margin:4px;width:150px}
+input,select{padding:6px;margin:4px;width:160px}
 button{padding:8px 15px;background:#6f8fb3;color:#fff;border:none;cursor:pointer}
 .box{background:#fff;padding:15px;margin-top:20px;border-radius:6px}
 .total{font-size:20px;color:#000;margin-top:10px}
@@ -27,7 +27,6 @@ Cliente: <input id="cliente"><br>
 Largura (m): <input id="largura" type="number" step="0.01"><br>
 Altura (m): <input id="altura" type="number" step="0.01"><br>
 Barra (m): <input id="barra" type="number" step="0.01" value="0.30"><br>
-
 Largura do tecido (m): <input id="larguraTecido" type="number" step="0.01" value="3"><br>
 
 Modelo da cortina:
@@ -81,28 +80,27 @@ let dadosCalculo = {};
 
 function calcular(){
 
-let largura = parseFloat(largura.value);
-let altura = parseFloat(document.getElementById("altura").value);
-let barra = parseFloat(document.getElementById("barra").value);
-let larguraTecido = parseFloat(document.getElementById("larguraTecido").value);
+let largura = parseFloat(document.getElementById("largura").value) || 0;
+let altura = parseFloat(document.getElementById("altura").value) || 0;
+let barra = parseFloat(document.getElementById("barra").value) || 0;
+let larguraTecido = parseFloat(document.getElementById("larguraTecido").value) || 3;
 
-let tipoForro = parseFloat(document.getElementById("tipoForro").value);
+let tipoForro = parseFloat(document.getElementById("tipoForro").value) || 0;
 
-let precoGaze = parseFloat(precoGaze.value);
-let precoEntretela = parseFloat(precoEntretela.value);
-let precoRodizio = parseFloat(precoRodizio.value);
-let precoTrilho = parseFloat(precoTrilho.value);
+let precoGaze = parseFloat(document.getElementById("precoGaze").value) || 0;
+let precoEntretela = parseFloat(document.getElementById("precoEntretela").value) || 0;
+let precoRodizio = parseFloat(document.getElementById("precoRodizio").value) || 0;
+let precoTrilho = parseFloat(document.getElementById("precoTrilho").value) || 0;
 
-let maoSem = parseFloat(maoSem.value);
-let maoCom = parseFloat(maoCom.value);
+let maoSem = parseFloat(document.getElementById("maoSem").value) || 0;
+let maoCom = parseFloat(document.getElementById("maoCom").value) || 0;
 
-let instalacao = parseFloat(instalacao.value);
+let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
 
 let alturaFinal = altura + barra + 0.12;
 
 let alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
 let metroGaze = alturasGaze * alturaFinal;
-
 let valorGaze = metroGaze * precoGaze;
 let valorEntretela = metroGaze * precoEntretela;
 
@@ -110,35 +108,26 @@ let alturasForro = 0;
 let metroForro = 0;
 let valorForro = 0;
 
-if(tipoForro>0){
+if(tipoForro > 0){
 alturasForro = Math.ceil((largura * 2) / larguraTecido);
 metroForro = alturasForro * alturaFinal;
 valorForro = metroForro * tipoForro;
 }
 
 let rodizio = Math.ceil((largura*100)/10);
-if(tipoForro>0){ rodizio*=2; }
+if(tipoForro > 0){ rodizio *= 2; }
 
 let valorRodizio = rodizio * precoRodizio;
 let valorTrilho = largura * precoTrilho;
 
 let custoMateriais = valorGaze + valorEntretela + valorForro + valorRodizio + valorTrilho;
-
-let maoObra = tipoForro>0 ? maoCom*largura : maoSem*largura;
+let maoObra = tipoForro>0 ? maoCom * largura : maoSem * largura;
 
 let total = custoMateriais + maoObra + instalacao;
 
-dadosCalculo = {
-largura,altura,barra,
-modelo: modelo.value,
-modeloForro: modeloForro.value,
-tipoForroTexto: tipoForro==0 ? "Sem Forro" :
-(tipoForro==13?"Microfibra":
-(tipoForro==23?"Blackout 70%":"Blackout 100%")),
-totalProjeto: total
-};
+dadosCalculo.totalProjeto = total;
 
-resultado.innerHTML = `
+document.getElementById("resultado").innerHTML = `
 Altura final: ${alturaFinal.toFixed(2)} m<br>
 Alturas gaze: ${alturasGaze}<br>
 Metro gaze: ${metroGaze.toFixed(2)} m<br>
@@ -154,79 +143,6 @@ Mão de obra: R$ ${maoObra.toFixed(2)}<br>
 Instalação: R$ ${instalacao.toFixed(2)}<br>
 <div class="total azul">Valor Final: R$ ${total.toFixed(2)}</div>
 `;
-}
-
-async function gerarPDF(){
-
-const { jsPDF } = window.jspdf;
-let doc = new jsPDF();
-
-function moeda(v){
-return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-
-let total = dadosCalculo.totalProjeto;
-let entradaPerc = parseFloat(entrada.value);
-let restantePerc = parseFloat(restante.value);
-
-let valorEntrada = total*(entradaPerc/100);
-let valorEntrega = total*(restantePerc/100);
-
-// Página 1
-doc.setFontSize(20);
-doc.setTextColor("#6f8fb3");
-doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
-
-doc.setFontSize(12);
-doc.setTextColor("#000");
-doc.text(`Cliente: ${cliente.value}`,20,40);
-doc.text(`Modelo: ${dadosCalculo.modelo}`,20,50);
-doc.text(`Modelo Forro: ${dadosCalculo.modeloForro}`,20,60);
-doc.text(`Tipo Forro: ${dadosCalculo.tipoForroTexto}`,20,70);
-doc.text(`Trilho: Trilho de teto`,20,80);
-doc.text(`Medidas: ${dadosCalculo.largura}L x ${dadosCalculo.altura}A`,20,90);
-doc.text(`Barra: ${dadosCalculo.barra} m`,20,100);
-
-doc.setFontSize(14);
-doc.setTextColor("#6f8fb3");
-doc.text("VALOR TOTAL DO PROJETO",105,130,{align:"center"});
-
-doc.setFontSize(22);
-doc.setTextColor("#000");
-doc.text(moeda(total),105,145,{align:"center"});
-
-doc.setFontSize(10);
-doc.text("Valor referente à confecção, fornecimento de materiais e instalação, conforme especificações acima.",105,160,{align:"center",maxWidth:170});
-
-// Página 2
-doc.addPage();
-
-doc.setFontSize(16);
-doc.setTextColor("#6f8fb3");
-doc.text("CONDIÇÕES CONTRATUAIS",105,20,{align:"center"});
-
-doc.setFontSize(12);
-doc.setTextColor("#000");
-doc.text(`Entrada (${entradaPerc}%): ${moeda(valorEntrada)}`,20,40);
-doc.text(`Entrega (${restantePerc}%): ${moeda(valorEntrega)}`,20,50);
-doc.text("Aceitamos Pix, dinheiro e cartão de crédito até 3x com juros.",20,60);
-doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,70);
-doc.text("Validade desta proposta: 7 dias.",20,80);
-
-doc.line(20,110,90,110);
-doc.line(120,110,190,110);
-
-doc.text("Patrícia Reis",20,120);
-doc.text("Ateliê Patrícia Reis",20,130);
-
-doc.text("Assinatura do Cliente",120,120);
-doc.text("Data: ____ / ____ / ______",120,130);
-
-doc.setFontSize(9);
-doc.text("Franca - São Paulo",105,280,{align:"center"});
-doc.text("16994284571  |  Ateliepatriciareiss",105,285,{align:"center"});
-
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
 
 </script>
