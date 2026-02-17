@@ -17,14 +17,15 @@ color:#2f3e55;
 }
 
 .container{
-max-width:700px;
+max-width:750px;
 margin:auto;
 }
 
 h1{
 text-align:center;
 color:#3f5f86;
-margin-bottom:30px;
+margin-bottom:35px;
+letter-spacing:1px;
 }
 
 input, select{
@@ -49,10 +50,10 @@ margin-top:10px;
 
 .resultado{
 background:#f4f6fa;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-line-height:1.6;
+padding:25px;
+border-radius:12px;
+margin-top:25px;
+line-height:1.7;
 }
 </style>
 </head>
@@ -89,7 +90,7 @@ line-height:1.6;
 
 <div class="resultado" id="resultado"></div>
 
-<hr>
+<hr style="margin:40px 0;">
 
 <h3>ORÇAMENTO PARA CLIENTE</h3>
 <input id="cliente" placeholder="Nome do Cliente">
@@ -98,6 +99,10 @@ line-height:1.6;
 </div>
 
 <script>
+
+function formatar(valor){
+return parseFloat(valor).toFixed(2).replace(".",",");
+}
 
 function calcular(){
 
@@ -145,21 +150,21 @@ window.tipoForroPDF = document.getElementById("tipoForro").selectedOptions[0].te
 document.getElementById("resultado").innerHTML = `
 <b>MODELO:</b> ${modelo}<br><br>
 
-<b>GAZE</b> — ${metragemGaze.toFixed(2)}m = R$ ${custoGaze.toFixed(2)}<br>
-<b>FORRO</b> — ${metragemForro.toFixed(2)}m = R$ ${custoForro.toFixed(2)}<br>
-<b>ENTRETELA</b> — ${metragemEntretela.toFixed(2)}m = R$ ${custoEntretela.toFixed(2)}<br>
-<b>RODÍZIOS</b> — ${rodizios} un = R$ ${custoRodizios.toFixed(2)}<br>
-<b>PRESILHAS</b> — ${presilhas} un = R$ ${custoPresilhas.toFixed(2)}<br>
-<b>TRILHO</b> — ${largura}m = R$ ${custoTrilho.toFixed(2)}<br><br>
+<b>GAZE</b> — ${formatar(metragemGaze)}m = R$ ${formatar(custoGaze)}<br>
+<b>FORRO</b> — ${formatar(metragemForro)}m = R$ ${formatar(custoForro)}<br>
+<b>ENTRETELA</b> — ${formatar(metragemEntretela)}m = R$ ${formatar(custoEntretela)}<br>
+<b>RODÍZIOS</b> — ${rodizios} un = R$ ${formatar(custoRodizios)}<br>
+<b>PRESILHAS</b> — ${presilhas} un = R$ ${formatar(custoPresilhas)}<br>
+<b>TRILHO</b> — ${formatar(largura)}m = R$ ${formatar(custoTrilho)}<br><br>
 
-<b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
-<b>LUCRO (MÃO DE OBRA + INSTALAÇÃO):</b> R$ ${lucro.toFixed(2)}<br><br>
+<b>CUSTO MATERIAIS:</b> R$ ${formatar(custoMateriais)}<br>
+<b>LUCRO (MÃO DE OBRA + INSTALAÇÃO):</b> R$ ${formatar(lucro)}<br><br>
 
-<h2>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
+<h2>VALOR FINAL: R$ ${formatar(valorFinal)}</h2>
 `;
 }
 
-async function gerarPDF(){
+function gerarPDF(){
 
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
@@ -167,11 +172,19 @@ const doc = new jsPDF();
 const cliente = document.getElementById("cliente").value || "";
 const data = new Date().toLocaleDateString("pt-BR");
 
+const larguraFormatada = formatar(window.larguraPDF);
+const alturaFormatada = formatar(window.alturaPDF);
+const barraCM = Math.round(window.barraPDF * 100);
+
 const img = new Image();
 img.src = "logo-pdf.png";
 
 img.onload = function(){
 
+// Marca d'água
+doc.addImage(img, "PNG", 35, 80, 140, 80, '', 'FAST');
+
+// Cabeçalho
 doc.addImage(img, "PNG", 55, 10, 100, 40);
 
 doc.setFontSize(16);
@@ -180,47 +193,49 @@ doc.text("ATELIÊ PATRÍCIA REIS",105,60,{align:"center"});
 doc.setFontSize(11);
 doc.text("Cortinas Sob Medida • Franca/SP",105,68,{align:"center"});
 
+// Dados
 doc.setTextColor(0,0,0);
 doc.setFontSize(11);
-
 doc.text(`Cliente: ${cliente}`,20,85);
 doc.text(`Data: ${data}`,20,92);
 
+// Especificações
 doc.setFontSize(12);
 doc.setTextColor(63,95,134);
 doc.text("ESPECIFICAÇÕES DO PROJETO",20,110);
 
 doc.setTextColor(0,0,0);
 doc.setFontSize(11);
-doc.text(`Modelo: ${window.modeloPDF}`,20,120);
-doc.text(`Tecido principal: Gaze de Linho`,20,127);
-doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,134);
-doc.text(`Tipo de Trilho: Trilho de teto`,20,141);
-doc.text(`Largura: ${window.larguraPDF} m`,20,148);
-doc.text(`Altura: ${window.alturaPDF} m`,20,155);
-doc.text(`Barra: ${window.barraPDF} m`,20,162);
+doc.text(`Modelo: ${window.modeloPDF}`,20,122);
+doc.text(`Tecido principal: Gaze de Linho`,20,130);
+doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,138);
+doc.text(`Tipo de Trilho: Trilho de teto`,20,146);
+doc.text(`Largura: ${larguraFormatada}L`,20,154);
+doc.text(`Altura: ${alturaFormatada}A`,20,162);
+doc.text(`Barra: ${barraCM} cm`,20,170);
 
-doc.text("O valor apresentado contempla todos os materiais necessários",20,175);
-doc.text("para a confecção, conforme especificação técnica,",20,182);
-doc.text("assim como a instalação no local.",20,189);
+doc.text("O valor apresentado contempla todos os materiais necessários",20,185);
+doc.text("para a confecção, conforme especificação técnica,",20,192);
+doc.text("assim como a instalação no local.",20,199);
 
+// Investimento
 doc.setFontSize(12);
 doc.setTextColor(63,95,134);
-doc.text("INVESTIMENTO",20,205);
+doc.text("INVESTIMENTO",20,215);
 
-doc.setFontSize(16);
+doc.setFontSize(18);
 doc.setTextColor(0,0,0);
-doc.text(`R$ ${window.valorFinalPDF}`,105,218,{align:"center"});
+doc.text(`R$ ${window.valorFinalPDF}`,105,230,{align:"center"});
 
+// Condições
 doc.setFontSize(11);
+doc.text("Forma de pagamento:",20,245);
+doc.text("60% de entrada para início da confecção",20,252);
+doc.text("40% na entrega/instalação.",20,259);
 
-doc.text("Forma de pagamento:",20,235);
-doc.text("60% de entrada para início da confecção",20,242);
-doc.text("40% na entrega/instalação.",20,249);
-
-doc.text("Prazo de confecção e entrega:",20,260);
-doc.text("Até 15 dias úteis para finalização e entrega,",20,267);
-doc.text("contados após a confirmação do pagamento da entrada.",20,274);
+doc.text("Prazo de confecção e entrega:",20,270);
+doc.text("Até 15 dias úteis para finalização e entrega,",20,277);
+doc.text("contados após a confirmação do pagamento da entrada.",20,284);
 
 doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
 
