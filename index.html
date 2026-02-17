@@ -148,7 +148,19 @@ window.barraPDF = barra;
 window.tipoForroPDF = document.getElementById("tipoForro").selectedOptions[0].text;
 
 document.getElementById("resultado").innerHTML = `
-<b>VALOR FINAL: R$ ${formatar(valorFinal)}</b>
+<b>MODELO:</b> ${modelo}<br><br>
+
+<b>GAZE:</b> ${formatar(metragemGaze)}m × 26 = R$ ${formatar(custoGaze)}<br>
+<b>FORRO:</b> ${formatar(metragemForro)}m × ${valorForro} = R$ ${formatar(custoForro)}<br>
+<b>ENTRETELA:</b> ${formatar(metragemEntretela)}m × 1,60 = R$ ${formatar(custoEntretela)}<br>
+<b>RODÍZIOS:</b> ${rodizios} un × 0,12 = R$ ${formatar(custoRodizios)}<br>
+<b>PRESILHAS:</b> ${presilhas} un × 1,60 = R$ ${formatar(custoPresilhas)}<br>
+<b>TRILHO:</b> ${formatar(largura)}m × 15 = R$ ${formatar(custoTrilho)}<br><br>
+
+<b>CUSTO TOTAL MATERIAIS:</b> R$ ${formatar(custoMateriais)}<br>
+<b>LUCRO (MÃO DE OBRA + INSTALAÇÃO):</b> R$ ${formatar(lucro)}<br><br>
+
+<h2>VALOR FINAL: R$ ${formatar(valorFinal)}</h2>
 `;
 }
 
