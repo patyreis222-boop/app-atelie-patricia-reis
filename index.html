@@ -15,7 +15,7 @@ body{
   padding:20px;
 }
 .container{
-  max-width:700px;
+  max-width:750px;
   margin:auto;
 }
 h1{
@@ -82,7 +82,6 @@ button{
 </select>
 
 <input id="presilhas" placeholder="Presilhas (un)">
-<input id="maoObra" placeholder="Mão de obra">
 <input id="instalacao" placeholder="Instalação">
 
 <button onclick="calcular()">Calcular</button>
@@ -91,6 +90,9 @@ button{
 
 <h2>Orçamento para Cliente</h2>
 <input id="cliente" placeholder="Nome do Cliente">
+<input id="entradaPercent" value="60" placeholder="Entrada (%)">
+<input id="entregaPercent" value="40" placeholder="Entrega (%)">
+
 <button onclick="gerarPDF()">Gerar PDF</button>
 
 </div>
@@ -111,18 +113,15 @@ function calcular(){
   const valorForroMetro = parseFloat(document.getElementById("forro").value);
 
   const presilhas = parseInt(document.getElementById("presilhas").value) || 0;
-  const maoObra = parseFloat(document.getElementById("maoObra").value) || 0;
   const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
 
   const larguraTecido = 3;
   const cabecalho = 0.12;
   const alturaFinal = altura + cabecalho + (barraCM/100);
 
-  // ===== GAZE =====
   const alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
   const metragemGaze = alturasGaze * alturaFinal;
 
-  // ===== FORRO =====
   let alturasForro = 0;
   let metragemForro = 0;
 
@@ -131,7 +130,6 @@ function calcular(){
     metragemForro = alturasForro * alturaFinal;
   }
 
-  // ===== PREÇOS =====
   const precoGaze = 26;
   const precoEntretela = 1.60;
   const precoRodizio = 0.12;
@@ -150,8 +148,10 @@ function calcular(){
   const custoTrilho = largura * precoTrilho;
 
   const custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
-  const lucro = maoObra + instalacao;
-  const valorFinal = custoMateriais + lucro;
+
+  const lucro = valorForroMetro === 0 ? largura * 150 : largura * 200;
+
+  const valorFinal = custoMateriais + lucro + instalacao;
 
   valorFinalGlobal = valorFinal;
 
@@ -161,40 +161,25 @@ function calcular(){
     largura,
     altura,
     barraCM,
-    valorFinal,
     tipoForro: document.getElementById("forro").selectedOptions[0].text
   };
 
   document.getElementById("resultado").innerHTML = `
-  <b>Alturas Gaze:</b> ${alturasGaze}<br>
-  <b>Metragem Gaze:</b> ${metragemGaze.toFixed(2)}m → R$ ${custoGaze.toFixed(2)}<br><br>
-
-  <b>Alturas Forro:</b> ${alturasForro}<br>
-  <b>Metragem Forro:</b> ${metragemForro.toFixed(2)}m → R$ ${custoForro.toFixed(2)}<br><br>
-
-  <b>Entretela:</b> ${metragemGaze.toFixed(2)}m → R$ ${custoEntretela.toFixed(2)}<br>
-  <b>Rodízios:</b> ${rodizios} un → R$ ${custoRodizio.toFixed(2)}<br>
-  <b>Presilhas:</b> ${presilhas} un → R$ ${custoPresilha.toFixed(2)}<br>
-  <b>Trilho:</b> ${largura.toFixed(2)}m → R$ ${custoTrilho.toFixed(2)}<br><br>
-
-  <b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
-  <b>LUCRO:</b> R$ ${lucro.toFixed(2)}<br><br>
-
-  <h3>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h3>
+  <b>Custo Materiais:</b> R$ ${custoMateriais.toFixed(2)}<br>
+  <b>Lucro (metro linear):</b> R$ ${lucro.toFixed(2)}<br>
+  <b>Instalação:</b> R$ ${instalacao.toFixed(2)}<br><br>
+  <h3>TOTAL DO PROJETO: R$ ${valorFinal.toFixed(2)}</h3>
   `;
 }
 
 function gerarPDF(){
 
-  if(valorFinalGlobal === 0){
-    alert("Clique em calcular antes.");
-    return;
-  }
-
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
   const cliente = document.getElementById("cliente").value || "Cliente";
+  const entrada = document.getElementById("entradaPercent").value;
+  const entrega = document.getElementById("entregaPercent").value;
   const data = new Date().toLocaleDateString();
 
   doc.setFontSize(16);
@@ -225,7 +210,23 @@ function gerarPDF(){
   doc.text(`R$ ${valorFinalGlobal.toFixed(2)}`,105,155,{align:"center"});
 
   doc.setFontSize(11);
-  doc.text("Valor referente à confecção, materiais e instalação conforme especificação acima.",105,165,{align:"center"});
+  doc.text("Valor referente à confecção, fornecimento de materiais e instalação conforme especificações acima.",105,165,{align:"center"});
+
+  doc.text("Forma de pagamento:",20,185);
+  doc.text(`${entrada}% de entrada para início da confecção.`,20,193);
+  doc.text(`${entrega}% na entrega e instalação.`,20,201);
+  doc.text("Aceitamos Pix, dinheiro e cartão de crédito em até 3x com juros.",20,209);
+
+  doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,221);
+  doc.text("Validade desta proposta: 7 dias.",20,229);
+
+  doc.line(20,240,190,240);
+
+  doc.text("_____________________________________",20,260);
+  doc.text("Patrícia Reis",20,268);
+
+  doc.text("_____________________________________",120,260);
+  doc.text("Assinatura do Cliente",120,268);
 
   doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
 }
