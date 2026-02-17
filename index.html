@@ -140,27 +140,15 @@ const custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizios +
 const lucro = (maoObra * largura) + instalacao;
 const valorFinal = custoMateriais + lucro;
 
-window.valorFinalPDF = valorFinal.toFixed(2);
+window.valorFinalPDF = formatar(valorFinal);
 window.modeloPDF = modelo;
-window.larguraPDF = largura;
-window.alturaPDF = altura;
+window.larguraPDF = formatar(largura);
+window.alturaPDF = formatar(altura);
 window.barraPDF = barra;
 window.tipoForroPDF = document.getElementById("tipoForro").selectedOptions[0].text;
 
 document.getElementById("resultado").innerHTML = `
-<b>MODELO:</b> ${modelo}<br><br>
-
-<b>GAZE</b> — ${formatar(metragemGaze)}m = R$ ${formatar(custoGaze)}<br>
-<b>FORRO</b> — ${formatar(metragemForro)}m = R$ ${formatar(custoForro)}<br>
-<b>ENTRETELA</b> — ${formatar(metragemEntretela)}m = R$ ${formatar(custoEntretela)}<br>
-<b>RODÍZIOS</b> — ${rodizios} un = R$ ${formatar(custoRodizios)}<br>
-<b>PRESILHAS</b> — ${presilhas} un = R$ ${formatar(custoPresilhas)}<br>
-<b>TRILHO</b> — ${formatar(largura)}m = R$ ${formatar(custoTrilho)}<br><br>
-
-<b>CUSTO MATERIAIS:</b> R$ ${formatar(custoMateriais)}<br>
-<b>LUCRO (MÃO DE OBRA + INSTALAÇÃO):</b> R$ ${formatar(lucro)}<br><br>
-
-<h2>VALOR FINAL: R$ ${formatar(valorFinal)}</h2>
+<b>VALOR FINAL: R$ ${formatar(valorFinal)}</b>
 `;
 }
 
@@ -171,76 +159,60 @@ const doc = new jsPDF();
 
 const cliente = document.getElementById("cliente").value || "";
 const data = new Date().toLocaleDateString("pt-BR");
-
-const larguraFormatada = formatar(window.larguraPDF);
-const alturaFormatada = formatar(window.alturaPDF);
 const barraCM = Math.round(window.barraPDF * 100);
 
-const img = new Image();
-img.src = "logo-pdf.png";
+doc.setFillColor(63,95,134);
+doc.rect(0,0,210,15,"F");
 
-img.onload = function(){
-
-// Marca d'água
-doc.addImage(img, "PNG", 35, 80, 140, 80, '', 'FAST');
-
-// Cabeçalho
-doc.addImage(img, "PNG", 55, 10, 100, 40);
+doc.addImage("logo-pdf.png","PNG",55,20,100,40);
 
 doc.setFontSize(16);
 doc.setTextColor(63,95,134);
-doc.text("ATELIÊ PATRÍCIA REIS",105,60,{align:"center"});
+doc.text("ATELIÊ PATRÍCIA REIS",105,70,{align:"center"});
 doc.setFontSize(11);
-doc.text("Cortinas Sob Medida • Franca/SP",105,68,{align:"center"});
-
-// Dados
-doc.setTextColor(0,0,0);
-doc.setFontSize(11);
-doc.text(`Cliente: ${cliente}`,20,85);
-doc.text(`Data: ${data}`,20,92);
-
-// Especificações
-doc.setFontSize(12);
-doc.setTextColor(63,95,134);
-doc.text("ESPECIFICAÇÕES DO PROJETO",20,110);
+doc.text("Cortinas Sob Medida • Franca/SP",105,78,{align:"center"});
 
 doc.setTextColor(0,0,0);
 doc.setFontSize(11);
-doc.text(`Modelo: ${window.modeloPDF}`,20,122);
-doc.text(`Tecido principal: Gaze de Linho`,20,130);
-doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,138);
-doc.text(`Tipo de Trilho: Trilho de teto`,20,146);
-doc.text(`Largura: ${larguraFormatada}L`,20,154);
-doc.text(`Altura: ${alturaFormatada}A`,20,162);
-doc.text(`Barra: ${barraCM} cm`,20,170);
 
-doc.text("O valor apresentado contempla todos os materiais necessários",20,185);
-doc.text("para a confecção, conforme especificação técnica,",20,192);
-doc.text("assim como a instalação no local.",20,199);
+doc.text(`Cliente: ${cliente}`,20,95);
+doc.text(`Data: ${data}`,20,102);
 
-// Investimento
 doc.setFontSize(12);
 doc.setTextColor(63,95,134);
-doc.text("INVESTIMENTO",20,215);
+doc.text("ESPECIFICAÇÕES DO PROJETO",20,120);
+
+doc.setTextColor(0,0,0);
+doc.setFontSize(11);
+doc.text(`Modelo: ${window.modeloPDF}`,20,132);
+doc.text(`Tecido principal: Gaze de Linho`,20,140);
+doc.text(`Tipo de Forro: ${window.tipoForroPDF}`,20,148);
+doc.text(`Tipo de Trilho: Trilho de teto`,20,156);
+doc.text(`Largura: ${window.larguraPDF}L`,20,164);
+doc.text(`Altura: ${window.alturaPDF}A`,20,172);
+doc.text(`Barra: ${barraCM} cm`,20,180);
+
+doc.text("O valor apresentado contempla todos os materiais necessários",20,195);
+doc.text("para a confecção, conforme especificação técnica,",20,202);
+doc.text("assim como a instalação no local.",20,209);
+
+doc.setFontSize(13);
+doc.setTextColor(63,95,134);
+doc.text("VALOR TOTAL DO PROJETO",105,225,{align:"center"});
 
 doc.setFontSize(18);
 doc.setTextColor(0,0,0);
-doc.text(`R$ ${window.valorFinalPDF}`,105,230,{align:"center"});
+doc.text(`R$ ${window.valorFinalPDF}`,105,238,{align:"center"});
 
-// Condições
+doc.setFontSize(10);
+doc.text("Valor referente à confecção e instalação, conforme especificação acima.",105,247,{align:"center"});
+
 doc.setFontSize(11);
-doc.text("Forma de pagamento:",20,245);
-doc.text("60% de entrada para início da confecção",20,252);
-doc.text("40% na entrega/instalação.",20,259);
-
-doc.text("Prazo de confecção e entrega:",20,270);
-doc.text("Até 15 dias úteis para finalização e entrega,",20,277);
-doc.text("contados após a confirmação do pagamento da entrada.",20,284);
+doc.text("Forma de pagamento:",20,265);
+doc.text("60% de entrada para início da confecção",20,272);
+doc.text("40% na entrega/instalação.",20,279);
 
 doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
-
-};
-
 }
 
 </script>
