@@ -15,7 +15,7 @@ body{
   padding:20px;
 }
 .container{
-  max-width:750px;
+  max-width:800px;
   margin:auto;
 }
 h1{
@@ -42,11 +42,18 @@ button{
 }
 .resultado{
   background:#e9edf2;
-  padding:15px;
+  padding:20px;
   border-radius:10px;
   margin-top:15px;
   font-size:14px;
-  line-height:1.6;
+  line-height:1.7;
+}
+.bloco{
+  margin-bottom:15px;
+}
+.titulo{
+  font-weight:bold;
+  color:#5f7fa6;
 }
 </style>
 </head>
@@ -82,6 +89,7 @@ button{
 </select>
 
 <input id="presilhas" placeholder="Presilhas (un)">
+<input id="maoObra" placeholder="Mão de Obra">
 <input id="instalacao" placeholder="Instalação">
 
 <button onclick="calcular()">Calcular</button>
@@ -90,9 +98,8 @@ button{
 
 <h2>Orçamento para Cliente</h2>
 <input id="cliente" placeholder="Nome do Cliente">
-<input id="entradaPercent" value="60" placeholder="Entrada (%)">
-<input id="entregaPercent" value="40" placeholder="Entrega (%)">
-
+<input id="entradaPercent" value="60">
+<input id="entregaPercent" value="40">
 <button onclick="gerarPDF()">Gerar PDF</button>
 
 </div>
@@ -113,6 +120,7 @@ function calcular(){
   const valorForroMetro = parseFloat(document.getElementById("forro").value);
 
   const presilhas = parseInt(document.getElementById("presilhas").value) || 0;
+  const maoObra = parseFloat(document.getElementById("maoObra").value) || 0;
   const instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
 
   const larguraTecido = 3;
@@ -141,7 +149,7 @@ function calcular(){
   const custoEntretela = metragemGaze * precoEntretela;
 
   const rodiziosBase = Math.ceil(largura * 10);
-  const rodizios = valorForroMetro !== 0 ? rodiziosBase * 2 : rodiziosBase;
+  const rodizios = valorForroMetro !== 0 ? rodiziosBase * 2 : 0;
   const custoRodizio = rodizios * precoRodizio;
 
   const custoPresilha = presilhas * precoPresilha;
@@ -149,31 +157,61 @@ function calcular(){
 
   const custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
 
-  const lucro = valorForroMetro === 0 ? largura * 150 : largura * 200;
+  const totalProjeto = custoMateriais + maoObra + instalacao;
 
-  const valorFinal = custoMateriais + lucro + instalacao;
-
-  valorFinalGlobal = valorFinal;
+  valorFinalGlobal = totalProjeto;
 
   dadosPDF = {
     modelo,
     modeloForro,
+    tipoForro: document.getElementById("forro").selectedOptions[0].text,
     largura,
     altura,
-    barraCM,
-    tipoForro: document.getElementById("forro").selectedOptions[0].text
+    barraCM
   };
 
   document.getElementById("resultado").innerHTML = `
-  <b>Custo Materiais:</b> R$ ${custoMateriais.toFixed(2)}<br>
-  <b>Lucro (metro linear):</b> R$ ${lucro.toFixed(2)}<br>
-  <b>Instalação:</b> R$ ${instalacao.toFixed(2)}<br><br>
-  <h3>TOTAL DO PROJETO: R$ ${valorFinal.toFixed(2)}</h3>
+  <div class="bloco">
+    <div class="titulo">ALTURA FINAL</div>
+    Altura base: ${altura.toFixed(2)} m<br>
+    Barra: ${(barraCM/100).toFixed(2)} m<br>
+    Cabeçalho: 0.12 m<br>
+    <b>Altura final de corte: ${alturaFinal.toFixed(2)} m</b>
+  </div>
+
+  <div class="bloco">
+    <div class="titulo">GAZE</div>
+    Alturas: ${alturasGaze}<br>
+    Metragem: ${metragemGaze.toFixed(2)} m<br>
+    Valor: R$ ${custoGaze.toFixed(2)}
+  </div>
+
+  <div class="bloco">
+    <div class="titulo">FORRO</div>
+    Alturas: ${alturasForro}<br>
+    Metragem: ${metragemForro.toFixed(2)} m<br>
+    Valor: R$ ${custoForro.toFixed(2)}
+  </div>
+
+  <div class="bloco">
+    <div class="titulo">MATERIAIS</div>
+    Entretela: R$ ${custoEntretela.toFixed(2)}<br>
+    Rodízios: ${rodizios} un → R$ ${custoRodizio.toFixed(2)}<br>
+    Presilhas: ${presilhas} un → R$ ${custoPresilha.toFixed(2)}<br>
+    Trilho: R$ ${custoTrilho.toFixed(2)}<br><br>
+    <b>Custo Total Materiais: R$ ${custoMateriais.toFixed(2)}</b>
+  </div>
+
+  <div class="bloco">
+    <div class="titulo">FINANCEIRO</div>
+    Mão de Obra: R$ ${maoObra.toFixed(2)}<br>
+    Instalação: R$ ${instalacao.toFixed(2)}<br><br>
+    <h3>Total do Projeto: R$ ${totalProjeto.toFixed(2)}</h3>
+  </div>
   `;
 }
 
 function gerarPDF(){
-
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -193,9 +231,9 @@ function gerarPDF(){
   doc.text(`Data: ${data}`,20,48);
 
   doc.text(`Modelo da Cortina: ${dadosPDF.modelo}`,20,60);
-  doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,68);
-  doc.text(`Tipo de Forro: ${dadosPDF.tipoForro}`,20,76);
-  doc.text(`Tecido principal: Gaze de Linho`,20,84);
+  doc.text(`Tecido Principal: Gaze de Linho`,20,68);
+  doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,76);
+  doc.text(`Tipo de Forro: ${dadosPDF.tipoForro}`,20,84);
   doc.text(`Trilho: Trilho de teto`,20,92);
 
   doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}L x ${dadosPDF.altura.toFixed(2)}A`,20,100);
@@ -212,15 +250,14 @@ function gerarPDF(){
   doc.setFontSize(11);
   doc.text("Valor referente à confecção, fornecimento de materiais e instalação conforme especificações acima.",105,165,{align:"center"});
 
-  doc.text("Forma de pagamento:",20,185);
-  doc.text(`${entrada}% de entrada para início da confecção.`,20,193);
-  doc.text(`${entrega}% na entrega e instalação.`,20,201);
-  doc.text("Aceitamos Pix, dinheiro e cartão de crédito em até 3x com juros.",20,209);
+  doc.text(`${entrada}% de entrada para início da confecção.`,20,185);
+  doc.text(`${entrega}% na entrega e instalação.`,20,193);
+  doc.text("Aceitamos Pix, dinheiro e cartão de crédito em até 3x com juros.",20,201);
 
-  doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,221);
-  doc.text("Validade desta proposta: 7 dias.",20,229);
+  doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,213);
+  doc.text("Validade desta proposta: 7 dias.",20,221);
 
-  doc.line(20,240,190,240);
+  doc.line(20,235,190,235);
 
   doc.text("_____________________________________",20,260);
   doc.text("Patrícia Reis",20,268);
