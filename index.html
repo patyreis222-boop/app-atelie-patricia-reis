@@ -2,147 +2,241 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Ateliê Patrícia Reis - Sistema Comercial</title>
-
+<title>Ateliê Patrícia Reis</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{font-family:Arial;margin:20px;background:#f8f9fb}
-h1{color:#6f8fb3}
-input,select{padding:6px;margin:4px;width:160px}
-button{padding:8px 15px;background:#6f8fb3;color:#fff;border:none;cursor:pointer}
-.box{background:#fff;padding:15px;margin-top:20px;border-radius:6px}
-.total{font-size:20px;color:#000;margin-top:10px}
-.azul{color:#6f8fb3;font-weight:bold}
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    max-width:750px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#6f8fb3;
+}
+
+label{
+    display:block;
+    margin-top:10px;
+}
+
+input, select{
+    width:100%;
+    padding:6px;
+    margin-top:3px;
+}
+
+button{
+    margin-top:15px;
+    padding:10px;
+    border:none;
+    background:#6f8fb3;
+    color:white;
+    cursor:pointer;
+}
+
+.resultado{
+    background:white;
+    padding:15px;
+    margin-top:20px;
+    border-radius:8px;
+    line-height:1.6;
+}
 </style>
 </head>
+
 <body>
 
 <h1>Ateliê Patrícia Reis</h1>
 
-<div class="box">
 <h3>Dados do Projeto</h3>
 
-Cliente: <input id="cliente"><br>
-Largura (m): <input id="largura" type="number" step="0.01"><br>
-Altura (m): <input id="altura" type="number" step="0.01"><br>
-Barra (m): <input id="barra" type="number" step="0.01" value="0.30"><br>
-Largura do tecido (m): <input id="larguraTecido" type="number" step="0.01" value="3"><br>
+<label>Cliente:</label>
+<input id="cliente">
 
-Modelo da cortina:
+<label>Largura (m):</label>
+<input id="largura" type="number" step="0.01">
+
+<label>Altura (m):</label>
+<input id="altura" type="number" step="0.01">
+
+<label>Barra (m):</label>
+<input id="barra" type="number" step="0.01">
+
+<label>Largura do tecido (m):</label>
+<input id="larguraTecido" type="number" value="3">
+
+<label>Modelo da cortina:</label>
 <select id="modelo">
 <option>Prega Macho</option>
-<option>Wave</option>
 <option>Prega Americana</option>
+<option>Wave</option>
 <option>Ilhós</option>
 <option>Franzido</option>
-</select><br>
+</select>
 
-Modelo do forro:
+<label>Modelo do forro:</label>
 <select id="modeloForro">
+<option>Sem forro</option>
 <option>Franzido</option>
 <option>Painel</option>
-</select><br>
+</select>
 
-Tipo de forro:
-<select id="tipoForro">
-<option value="0">Sem forro</option>
-<option value="13">Microfibra</option>
-<option value="23">Blackout 70%</option>
-<option value="31">Blackout 100%</option>
-</select><br>
+<label>Preço Gaze (m):</label>
+<input id="precoGaze" type="number">
 
-Preço Gaze (m): <input id="precoGaze" value="26"><br>
-Preço Entretela (m): <input id="precoEntretela" value="1.6"><br>
-Preço Rodízio (un): <input id="precoRodizio" value="0.12"><br>
-Preço Trilho (m): <input id="precoTrilho" value="15"><br>
+<label>Preço Entretela (m):</label>
+<input id="precoEntretela" type="number">
 
-Mão de obra sem forro (m): <input id="maoSem" value="150"><br>
-Mão de obra com forro (m): <input id="maoCom" value="200"><br>
+<label>Preço Rodízio (un):</label>
+<input id="precoRodizio" type="number">
 
-Instalação: <input id="instalacao" value="0"><br>
+<label>Preço Trilho (m):</label>
+<input id="precoTrilho" type="number">
 
-Entrada (%): <input id="entrada" value="60"><br>
-Entrega (%): <input id="restante" value="40"><br>
+<label>Mão de obra sem forro (m):</label>
+<input id="maoSem" type="number">
+
+<label>Mão de obra com forro (m):</label>
+<input id="maoCom" type="number">
+
+<label>Instalação:</label>
+<input id="instalacao" type="number">
+
+<label>Entrada (%):</label>
+<input id="entrada" type="number">
+
+<label>Entrega (%):</label>
+<input id="restante" type="number">
 
 <button onclick="calcular()">Calcular</button>
 <button onclick="gerarPDF()">Gerar PDF</button>
-</div>
 
-<div class="box">
-<h3>Detalhamento Técnico</h3>
-<div id="resultado"></div>
-</div>
+<div class="resultado" id="resultado"></div>
 
 <script>
 
-let dadosCalculo = {};
+let dados = {};
+
+function formatar(valor){
+    return valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
 
 function calcular(){
 
-let largura = parseFloat(document.getElementById("largura").value) || 0;
-let altura = parseFloat(document.getElementById("altura").value) || 0;
-let barra = parseFloat(document.getElementById("barra").value) || 0;
-let larguraTecido = parseFloat(document.getElementById("larguraTecido").value) || 3;
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let barra = parseFloat(document.getElementById("barra").value);
+let larguraTecido = parseFloat(document.getElementById("larguraTecido").value);
 
-let tipoForro = parseFloat(document.getElementById("tipoForro").value) || 0;
+let precoGaze = parseFloat(document.getElementById("precoGaze").value);
+let precoEntretela = parseFloat(document.getElementById("precoEntretela").value);
+let precoRodizio = parseFloat(document.getElementById("precoRodizio").value);
+let precoTrilho = parseFloat(document.getElementById("precoTrilho").value);
 
-let precoGaze = parseFloat(document.getElementById("precoGaze").value) || 0;
-let precoEntretela = parseFloat(document.getElementById("precoEntretela").value) || 0;
-let precoRodizio = parseFloat(document.getElementById("precoRodizio").value) || 0;
-let precoTrilho = parseFloat(document.getElementById("precoTrilho").value) || 0;
+let maoSem = parseFloat(document.getElementById("maoSem").value);
+let maoCom = parseFloat(document.getElementById("maoCom").value);
+let instalacao = parseFloat(document.getElementById("instalacao").value);
 
-let maoSem = parseFloat(document.getElementById("maoSem").value) || 0;
-let maoCom = parseFloat(document.getElementById("maoCom").value) || 0;
+let modeloForro = document.getElementById("modeloForro").value;
 
-let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
+let alturaFinal = altura + barra;
 
-let alturaFinal = altura + barra + 0.12;
-
-let alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
+let alturasGaze = Math.ceil(largura / larguraTecido);
 let metroGaze = alturasGaze * alturaFinal;
 let valorGaze = metroGaze * precoGaze;
-let valorEntretela = metroGaze * precoEntretela;
 
-let alturasForro = 0;
-let metroForro = 0;
-let valorForro = 0;
+let alturasForro = modeloForro != "Sem forro" ? alturasGaze : 0;
+let metroForro = alturasForro * alturaFinal;
+let valorForro = metroForro * precoGaze;
 
-if(tipoForro > 0){
-alturasForro = Math.ceil((largura * 2) / larguraTecido);
-metroForro = alturasForro * alturaFinal;
-valorForro = metroForro * tipoForro;
+let rodizios = Math.ceil((largura*100)/10);
+if(modeloForro != "Sem forro"){
+    rodizios = rodizios * 2;
 }
+let valorRodizio = rodizios * precoRodizio;
 
-let rodizio = Math.ceil((largura*100)/10);
-if(tipoForro > 0){ rodizio *= 2; }
+let entretela = metroGaze * precoEntretela;
+let trilho = largura * precoTrilho;
 
-let valorRodizio = rodizio * precoRodizio;
-let valorTrilho = largura * precoTrilho;
+let materiais = valorGaze + valorForro + valorRodizio + entretela + trilho;
 
-let custoMateriais = valorGaze + valorEntretela + valorForro + valorRodizio + valorTrilho;
-let maoObra = tipoForro>0 ? maoCom * largura : maoSem * largura;
+let maoObra = modeloForro == "Sem forro" ? largura * maoSem : largura * maoCom;
 
-let total = custoMateriais + maoObra + instalacao;
+let total = materiais + maoObra + instalacao;
 
-dadosCalculo.totalProjeto = total;
+dados = {
+cliente: document.getElementById("cliente").value,
+total: total
+};
 
 document.getElementById("resultado").innerHTML = `
-Altura final: ${alturaFinal.toFixed(2)} m<br>
-Alturas gaze: ${alturasGaze}<br>
+<h3>Detalhamento Técnico</h3>
+Altura final: ${alturaFinal.toFixed(2)} m<br><br>
 Metro gaze: ${metroGaze.toFixed(2)} m<br>
-Valor gaze: R$ ${valorGaze.toFixed(2)}<br>
-Alturas forro: ${alturasForro}<br>
+Valor gaze: ${formatar(valorGaze)}<br><br>
 Metro forro: ${metroForro.toFixed(2)} m<br>
-Valor forro: R$ ${valorForro.toFixed(2)}<br>
-Rodízios: ${rodizio} (R$ ${valorRodizio.toFixed(2)})<br>
-Entretela: R$ ${valorEntretela.toFixed(2)}<br>
-Trilho: R$ ${valorTrilho.toFixed(2)}<br>
-Custo materiais: R$ ${custoMateriais.toFixed(2)}<br>
-Mão de obra: R$ ${maoObra.toFixed(2)}<br>
-Instalação: R$ ${instalacao.toFixed(2)}<br>
-<div class="total azul">Valor Final: R$ ${total.toFixed(2)}</div>
+Valor forro: ${formatar(valorForro)}<br><br>
+Rodízios: ${rodizios} (${formatar(valorRodizio)})<br><br>
+Entretela: ${formatar(entretela)}<br>
+Trilho: ${formatar(trilho)}<br><br>
+Mão de obra: ${formatar(maoObra)}<br>
+Instalação: ${formatar(instalacao)}<br><br>
+<h2>Valor Final: ${formatar(total)}</h2>
 `;
+
+}
+
+async function gerarPDF(){
+
+const { jsPDF } = window.jspdf;
+let doc = new jsPDF();
+
+doc.setFontSize(18);
+doc.setTextColor("#6f8fb3");
+doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
+
+doc.setFontSize(12);
+doc.setTextColor("#000");
+
+doc.text(`Cliente: ${dados.cliente}`,20,40);
+
+doc.setFontSize(14);
+doc.setTextColor("#6f8fb3");
+doc.text("VALOR TOTAL DO PROJETO",105,70,{align:"center"});
+
+doc.setFontSize(22);
+doc.setTextColor("#000");
+doc.text(formatar(dados.total),105,85,{align:"center"});
+
+doc.addPage();
+
+doc.setFontSize(16);
+doc.setTextColor("#6f8fb3");
+doc.text("CONDIÇÕES CONTRATUAIS",105,20,{align:"center"});
+
+doc.setFontSize(11);
+doc.setTextColor("#000");
+
+doc.text("1. A confecção inicia após pagamento da entrada.",20,40);
+doc.text("2. Prazo estimado de até 15 dias úteis.",20,50);
+doc.text("3. Produto sob medida não possui troca.",20,60);
+
+doc.line(20,200,190,200);
+
+doc.text("Patrícia Reis",20,210);
+doc.text("Assinatura do Cliente",130,210);
+
+doc.setFontSize(9);
+doc.text("Franca - SP",105,285,{align:"center"});
+doc.text("WhatsApp: 16994284571 | @Ateliepatriciareiss",105,292,{align:"center"});
+
+doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
+
 }
 
 </script>
