@@ -122,12 +122,15 @@ function calcular(){
   const cabecalho = 0.12;
   const alturaFinal = altura + cabecalho + (barraCM/100);
 
+  // ===== GAZE =====
   const alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
   const metragemGaze = alturasGaze * alturaFinal;
 
+  // ===== FORRO =====
   const alturasForro = Math.ceil((largura * 2) / larguraTecido);
   const metragemForro = alturasForro * alturaFinal;
 
+  // ===== PREÇOS =====
   const precoGaze = 26;
   const precoEntretela = 1.60;
   const precoRodizio = 0.12;
@@ -136,13 +139,18 @@ function calcular(){
 
   const custoGaze = metragemGaze * precoGaze;
   const custoForro = metragemForro * valorForroMetro;
-  const custoEntretela = metragemGaze * precoEntretela;
+
+  const metragemEntretela = metragemGaze;
+  const custoEntretela = metragemEntretela * precoEntretela;
+
   const rodizios = Math.ceil(largura * 10);
   const custoRodizio = rodizios * precoRodizio;
+
   const custoPresilha = presilhas * precoPresilha;
   const custoTrilho = largura * precoTrilho;
 
   const custoMateriais = custoGaze + custoForro + custoEntretela + custoRodizio + custoPresilha + custoTrilho;
+
   const lucro = maoObra + instalacao;
   const valorFinal = custoMateriais + lucro;
 
@@ -158,14 +166,21 @@ function calcular(){
   };
 
   document.getElementById("resultado").innerHTML = `
-  <b>Gaze:</b> ${metragemGaze.toFixed(2)}m → R$ ${custoGaze.toFixed(2)}<br>
-  <b>Forro:</b> ${metragemForro.toFixed(2)}m → R$ ${custoForro.toFixed(2)}<br>
-  <b>Entretela:</b> R$ ${custoEntretela.toFixed(2)}<br>
+  <b>Alturas Gaze:</b> ${alturasGaze}<br>
+  <b>Metragem Gaze:</b> ${metragemGaze.toFixed(2)}m → R$ ${custoGaze.toFixed(2)}<br><br>
+
+  <b>Alturas Forro:</b> ${alturasForro}<br>
+  <b>Metragem Forro:</b> ${metragemForro.toFixed(2)}m → R$ ${custoForro.toFixed(2)}<br><br>
+
+  <b>Entretela:</b> ${metragemEntretela.toFixed(2)}m → R$ ${custoEntretela.toFixed(2)}<br>
   <b>Rodízios:</b> ${rodizios} un → R$ ${custoRodizio.toFixed(2)}<br>
   <b>Presilhas:</b> ${presilhas} un → R$ ${custoPresilha.toFixed(2)}<br>
-  <b>Trilho:</b> R$ ${custoTrilho.toFixed(2)}<br><br>
+  <b>Trilho:</b> ${largura.toFixed(2)}m → R$ ${custoTrilho.toFixed(2)}<br><br>
 
-  <b>VALOR FINAL:</b> R$ ${valorFinal.toFixed(2)}
+  <b>CUSTO MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
+  <b>LUCRO:</b> R$ ${lucro.toFixed(2)}<br><br>
+
+  <h3>VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h3>
   `;
 }
 
@@ -182,7 +197,6 @@ function gerarPDF(){
   const cliente = document.getElementById("cliente").value || "Cliente";
   const data = new Date().toLocaleDateString();
 
-  // Página 1
   doc.setFontSize(16);
   doc.setTextColor(95,127,163);
   doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
@@ -193,30 +207,26 @@ function gerarPDF(){
   doc.text(`Cliente: ${cliente}`,20,40);
   doc.text(`Data: ${data}`,20,48);
 
-  doc.setTextColor(95,127,163);
-  doc.text("ESPECIFICAÇÕES DO PROJETO",20,65);
+  doc.text(`Modelo da Cortina: ${dadosPDF.modelo}`,20,60);
+  doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,68);
+  doc.text(`Tecido principal: Gaze de Linho`,20,76);
+  doc.text(`Trilho: Trilho de teto`,20,84);
 
-  doc.setTextColor(0,0,0);
-  doc.text(`Modelo da Cortina: ${dadosPDF.modelo}`,20,75);
-  doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,83);
-  doc.text(`Tecido principal: Gaze de Linho`,20,91);
-  doc.text(`Tipo de Trilho: Trilho de teto`,20,99);
-  doc.text(`Largura: ${dadosPDF.largura.toFixed(2)}L`,20,107);
-  doc.text(`Altura: ${dadosPDF.altura.toFixed(2)}A`,20,115);
-  doc.text(`Barra: ${dadosPDF.barraCM} cm`,20,123);
+  doc.text(`Largura: ${dadosPDF.largura.toFixed(2)}L`,20,92);
+  doc.text(`Altura: ${dadosPDF.altura.toFixed(2)}A`,20,100);
+  doc.text(`Barra: ${dadosPDF.barraCM} cm`,20,108);
 
   doc.setFontSize(14);
   doc.setTextColor(95,127,163);
-  doc.text("VALOR TOTAL DO PROJETO",105,150,{align:"center"});
+  doc.text("VALOR TOTAL DO PROJETO",105,140,{align:"center"});
 
   doc.setFontSize(20);
   doc.setTextColor(0,0,0);
-  doc.text(`R$ ${valorFinalGlobal.toFixed(2)}`,105,165,{align:"center"});
+  doc.text(`R$ ${valorFinalGlobal.toFixed(2)}`,105,155,{align:"center"});
 
   doc.setFontSize(11);
-  doc.text("Valor referente à confecção, materiais e instalação conforme especificação acima.",105,175,{align:"center"});
+  doc.text("Valor referente à confecção, materiais e instalação conforme especificação acima.",105,165,{align:"center"});
 
-  // Página 2
   doc.addPage();
 
   doc.setFontSize(14);
