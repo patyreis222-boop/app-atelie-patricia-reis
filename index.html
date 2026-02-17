@@ -9,7 +9,7 @@
 
 <style>
 body{
-font-family: 'Helvetica', sans-serif;
+font-family: Helvetica, Arial, sans-serif;
 background:#ffffff;
 margin:0;
 padding:30px;
@@ -152,10 +152,10 @@ document.getElementById("resultado").innerHTML = `
 
 <b>GAZE:</b> ${formatar(metragemGaze)}m × 26 = R$ ${formatar(custoGaze)}<br>
 <b>FORRO:</b> ${formatar(metragemForro)}m = R$ ${formatar(custoForro)}<br>
-<b>ENTRETELA:</b> ${formatar(metragemEntretela)}m = R$ ${formatar(custoEntretela)}<br>
-<b>RODÍZIOS:</b> ${rodizios} un = R$ ${formatar(custoRodizios)}<br>
-<b>PRESILHAS:</b> ${presilhas} un = R$ ${formatar(custoPresilhas)}<br>
-<b>TRILHO:</b> ${formatar(largura)}m = R$ ${formatar(custoTrilho)}<br><br>
+<b>ENTRETELA:</b> ${formatar(metragemEntretela)}m × 1,60 = R$ ${formatar(custoEntretela)}<br>
+<b>RODÍZIOS:</b> ${rodizios} un × 0,12 = R$ ${formatar(custoRodizios)}<br>
+<b>PRESILHAS:</b> ${presilhas} un × 1,60 = R$ ${formatar(custoPresilhas)}<br>
+<b>TRILHO:</b> ${formatar(largura)}m × 15 = R$ ${formatar(custoTrilho)}<br><br>
 
 <b>CUSTO TOTAL MATERIAIS:</b> R$ ${formatar(custoMateriais)}<br>
 <b>LUCRO (MÃO DE OBRA + INSTALAÇÃO):</b> R$ ${formatar(lucro)}<br><br>
@@ -173,6 +173,7 @@ const cliente = document.getElementById("cliente").value || "";
 const data = new Date().toLocaleDateString("pt-BR");
 const barraCM = Math.round(window.barraPDF * 100);
 
+// PÁGINA 1
 doc.setFillColor(94,132,169);
 doc.rect(0,0,210,15,"F");
 
@@ -210,39 +211,55 @@ doc.text("assim como a instalação no local.",20,209);
 
 doc.setFontSize(14);
 doc.setTextColor(94,132,169);
-doc.text("VALOR TOTAL DO PROJETO",105,230,{align:"center"});
+doc.text("VALOR TOTAL DO PROJETO",105,225,{align:"center"});
 
 doc.setFontSize(20);
 doc.setTextColor(0,0,0);
-doc.text(`R$ ${window.valorFinalPDF}`,105,245,{align:"center"});
+doc.text(`R$ ${window.valorFinalPDF}`,105,240,{align:"center"});
 
 doc.setFontSize(10);
-doc.text("Valor referente à confecção e instalação, conforme especificação acima.",105,255,{align:"center"});
+doc.text("Valor referente à confecção e instalação, conforme especificação acima.",105,250,{align:"center"});
 
 doc.setFontSize(11);
 doc.setTextColor(94,132,169);
-doc.text("FORMA DE PAGAMENTO",20,270);
+doc.text("FORMA DE PAGAMENTO",20,265);
 
 doc.setTextColor(0,0,0);
-doc.text("60% de entrada para início da confecção.",20,277);
-doc.text("40% na entrega/instalação.",20,284);
+doc.text("60% de entrada para início da confecção.",20,272);
+doc.text("40% na entrega/instalação.",20,279);
 
 doc.setTextColor(94,132,169);
-doc.text("PRAZOS",20,295);
+doc.text("PRAZOS",20,290);
 
 doc.setTextColor(0,0,0);
-doc.text("Prazo de confecção: até 15 dias úteis após confirmação da entrada.",20,302);
-doc.text("Validade desta proposta: 7 dias corridos.",20,309);
+doc.text("Prazo de confecção: até 15 dias úteis após confirmação da entrada.",20,297);
+doc.text("Validade desta proposta: 7 dias corridos.",20,304);
+
+// PÁGINA 2
+doc.addPage();
+
+doc.setFillColor(94,132,169);
+doc.rect(0,0,210,15,"F");
+
+doc.setFontSize(14);
+doc.setTextColor(94,132,169);
+doc.text("ASSINATURAS",105,40,{align:"center"});
 
 doc.setDrawColor(94,132,169);
-doc.line(20,320,190,320);
+doc.line(20,55,190,55);
 
-doc.text("________________________________________",20,335);
-doc.text("Patrícia Reis",20,342);
-doc.text("Ateliê Patrícia Reis",20,349);
+doc.setTextColor(0,0,0);
+doc.setFontSize(11);
 
-doc.text("________________________________________",120,335);
-doc.text("Assinatura do Cliente",120,342);
+doc.text("Declaro estar de acordo com as especificações e condições acima descritas.",20,75);
+
+doc.text("________________________________________",20,110);
+doc.text("Patrícia Reis",20,118);
+doc.text("Ateliê Patrícia Reis",20,125);
+
+doc.text("________________________________________",120,110);
+doc.text("Assinatura do Cliente",120,118);
+doc.text("Data: ____ / ____ / ______",120,125);
 
 doc.save("Orcamento_Atelie_Patricia_Reis.pdf");
 }
