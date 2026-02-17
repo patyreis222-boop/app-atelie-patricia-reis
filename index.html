@@ -147,9 +147,10 @@ let totalProjeto=0;
 
 function calcular(){
 
-let largura=parseFloat(document.getElementById("largura").value);
-let altura=parseFloat(document.getElementById("altura").value);
-let barra=parseFloat(document.getElementById("barra").value)/100;
+let largura=parseFloat(document.getElementById("largura").value)||0;
+let altura=parseFloat(document.getElementById("altura").value)||0;
+let barraCm=parseFloat(document.getElementById("barra").value)||0;
+let barra=barraCm/100;
 
 let forro=document.getElementById("forro").value;
 
@@ -169,6 +170,63 @@ if(forro!=="Sem Forro"){
 metragemForro=fatorForro*alturaFinal;
 }
 
+let custoGaze=metragemGaze*26;
+
+let custoForro=0;
+if(forro==="Blackout 100%") custoForro=metragemForro*31;
+if(forro==="Blackout 70%") custoForro=metragemForro*23;
+if(forro==="Microfibra") custoForro=metragemForro*13;
+
+let custoEntretela=metragemGaze*1.6;
+
+let custoRodizio=0;
+if(forro!=="Sem Forro"){
+custoRodizio=(largura*20)*0.12;
+}
+
+let presilhasQtd=parseInt(document.getElementById("presilhas").value)||0;
+let custoPresilhas=presilhasQtd*1.6;
+
+let custoTrilho=largura*15;
+
+let custoMateriais=custoGaze+custoForro+custoEntretela+custoRodizio+custoPresilhas+custoTrilho;
+
+let maoObra=0;
+if(forro==="Sem Forro"){
+maoObra=largura*maoSem;
+}else{
+maoObra=largura*maoCom;
+}
+
+totalProjeto=custoMateriais+maoObra+instalacao;
+
+document.getElementById("resultado").innerHTML=`
+
+<b>ALTURA FINAL (com barra + cabeçalho):</b> ${alturaFinal.toFixed(2)} m<br><br>
+
+<b>GAZE</b><br>
+Alturas: ${fatorGaze.toFixed(2)}<br>
+Metragem: ${metragemGaze.toFixed(2)} m<br>
+Valor: R$ ${custoGaze.toFixed(2)}<br><br>
+
+<b>FORRO</b><br>
+Alturas: ${forro==="Sem Forro" ? "Não aplicado" : fatorForro.toFixed(2)}<br>
+Metragem: ${forro==="Sem Forro" ? "0" : metragemForro.toFixed(2)} m<br>
+Valor: R$ ${custoForro.toFixed(2)}<br><br>
+
+<b>ENTRETELA:</b> R$ ${custoEntretela.toFixed(2)}<br>
+<b>RODÍZIOS:</b> R$ ${custoRodizio.toFixed(2)}<br>
+<b>PRESILHAS (${presilhasQtd} un):</b> R$ ${custoPresilhas.toFixed(2)}<br>
+<b>TRILHO:</b> R$ ${custoTrilho.toFixed(2)}<br><br>
+
+<b>CUSTO TOTAL MATERIAIS:</b> R$ ${custoMateriais.toFixed(2)}<br>
+<b>MÃO DE OBRA:</b> R$ ${maoObra.toFixed(2)}<br>
+<b>INSTALAÇÃO:</b> R$ ${instalacao.toFixed(2)}<br><br>
+
+<b style="font-size:18px;">TOTAL DO PROJETO: R$ ${totalProjeto.toFixed(2)}</b>
+
+`;
+}
 let custoGaze=metragemGaze*26;
 let custoForro=0;
 
