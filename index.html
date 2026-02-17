@@ -236,7 +236,20 @@ doc.text(
 y,
 { maxWidth: 170 }
 );
+y += 20;
 
+// BLOCO VALOR TOTAL CENTRALIZADO
+doc.setFontSize(13);
+doc.setTextColor("#6f8fb3");
+doc.text("VALOR TOTAL DO PROJETO", 105, y, { align: "center" });
+
+y += 10;
+
+doc.setFontSize(22);
+doc.setTextColor("#000");
+doc.text(formatar(total), 105, y, { align: "center" });
+
+y += 20;
 // NOVA PÁGINA PARA ASSINATURAS
 doc.addPage();
 
