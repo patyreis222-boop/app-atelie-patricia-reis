@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ateliê Patrícia Reis – Sistema Completo</title>
+<title>Ateliê Patrícia Reis – Sistema Comercial</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -16,18 +16,18 @@ padding:20px;
 }
 
 .container{
-max-width:800px;
+max-width:750px;
 margin:auto;
 background:#fff;
-padding:30px;
-border-radius:16px;
-box-shadow:0 6px 25px rgba(0,0,0,0.08);
+padding:25px;
+border-radius:14px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
 h1{
 text-align:center;
 color:#1f3c88;
-margin-bottom:25px;
+margin-bottom:20px;
 }
 
 label{
@@ -57,14 +57,14 @@ cursor:pointer;
 }
 
 .result{
-margin-top:30px;
+margin-top:25px;
 background:#f1f4fa;
-padding:20px;
-border-radius:12px;
+padding:15px;
+border-radius:10px;
 }
 
 hr{
-margin:18px 0;
+margin:15px 0;
 }
 </style>
 </head>
@@ -127,7 +127,6 @@ margin:18px 0;
 <button onclick="gerarPDF()">Gerar PDF Comercial</button>
 
 <div class="result" id="resultado"></div>
-
 </div>
 
 <script>
@@ -179,29 +178,29 @@ let valorPresilha=presilhas*1.60;
 let valorTrilho=largura*15;
 
 let custoMateriais=valorGaze+valorForro+valorEntretela+valorRodizio+valorPresilha+valorTrilho;
+
 let maoObra=(forro=="sem"?maoSem:maoCom)*largura;
+
 let valorFinal=custoMateriais+maoObra+instalacao+extra;
 
-dadosPDF = { largura, altura, modeloCortina, modeloForro, forro, valorFinal };
+dadosPDF={
+largura,
+altura,
+modeloCortina,
+modeloForro,
+forro,
+valorFinal
+};
 
 document.getElementById("resultado").innerHTML=`
 <h3>DETALHAMENTO TÉCNICO</h3>
 
-<p><strong>Modelo Cortina:</strong> ${modeloCortina}</p>
-<p><strong>Modelo Forro:</strong> ${forro!="sem" ? modeloForro : "Sem Forro"}</p>
-
-<hr>
-
 <p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
 <p><strong>Alturas Gaze:</strong> ${alturasGaze}</p>
-<p><strong>Metragem Gaze:</strong> ${metroGaze.toFixed(2)} m</p>
-<p><strong>Valor Gaze:</strong> R$ ${valorGaze.toFixed(2)}</p>
-
-<hr>
+<p><strong>Metragem Gaze:</strong> ${metroGaze.toFixed(2)} m (R$ ${valorGaze.toFixed(2)})</p>
 
 <p><strong>Alturas Forro:</strong> ${alturasForro}</p>
-<p><strong>Metragem Forro:</strong> ${metroForro.toFixed(2)} m</p>
-<p><strong>Valor Forro:</strong> R$ ${valorForro.toFixed(2)}</p>
+<p><strong>Metragem Forro:</strong> ${metroForro.toFixed(2)} m (R$ ${valorForro.toFixed(2)})</p>
 
 <hr>
 
@@ -228,32 +227,54 @@ return;
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-doc.setFontSize(20);
+let hoje = new Date().toLocaleDateString("pt-BR");
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(18);
 doc.setTextColor("#1f3c88");
 doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
 
-doc.setFontSize(13);
-doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
-
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
 doc.setTextColor("#000");
-doc.setFontSize(12);
 
-doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,55);
+let y=40;
+
+doc.text(`Cliente: ____________________________`,20,y); y+=8;
+doc.text(`Data: ${hoje}`,20,y); y+=15;
+
+doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,y); y+=8;
 
 if(dadosPDF.forro!="sem"){
-doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,65);
+doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,y); y+=8;
 }
 
-doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,80);
+doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,y); y+=20;
 
-doc.setFontSize(16);
+doc.setFont("helvetica","bold");
+doc.setFontSize(14);
 doc.setTextColor("#1f3c88");
-doc.text("VALOR TOTAL DO PROJETO",105,110,{align:"center"});
+doc.text("VALOR TOTAL DO PROJETO",105,y,{align:"center"}); y+=12;
 
-doc.setFontSize(22);
-doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,125,{align:"center"});
+doc.setFontSize(18);
+doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,y,{align:"center"}); y+=20;
 
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+doc.setTextColor("#000");
+
+doc.text("60% de entrada para início da confecção.",20,y); y+=8;
+doc.text("40% na entrega e instalação.",20,y); y+=8;
+doc.text("Prazo: até 15 dias úteis após confirmação da entrada.",20,y); y+=8;
+doc.text("Validade desta proposta: 7 dias.",20,y); y+=25;
+
+doc.line(20,y,90,y);
+doc.text("Patrícia Reis",20,y+8);
+
+doc.line(120,y,190,y);
+doc.text("Assinatura do Cliente",120,y+8);
+
+doc.save("Proposta_Comercial_Atelie_Patricia_Reis.pdf");
 }
 
 </script>
