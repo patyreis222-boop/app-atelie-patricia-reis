@@ -74,6 +74,12 @@ margin:15px 0;
 
 <h1>Ateliê Patrícia Reis</h1>
 
+<label>Nome do Cliente</label>
+<input type="text" id="cliente">
+
+<label>Largura da Cortina (m)</label>
+<input type="number" id="largura" step="0.01">
+
 <label>Largura da Cortina (m)</label>
 <input type="number" id="largura" step="0.01">
 
@@ -235,6 +241,8 @@ return;
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
+let cliente = document.getElementById("cliente").value || "Cliente";
+
 let largura=parseFloat(document.getElementById("largura").value);
 let altura=parseFloat(document.getElementById("altura").value);
 let barra=document.getElementById("barra").value;
@@ -242,17 +250,19 @@ let modeloCortina=document.getElementById("modeloCortina").value;
 let modeloForro=document.getElementById("modeloForro").value;
 let forro=document.getElementById("forro").value;
 
-let validade = document.getElementById("validade") ? document.getElementById("validade").value : "7";
+let validade = document.getElementById("validade").value;
 
-let percentualEntrada = 60; // pode tornar editável depois
+let percentualEntrada = 60;
 let valorEntrada = (ultimoValorFinal * percentualEntrada) / 100;
 let valorRestante = ultimoValorFinal - valorEntrada;
+
+let hoje = new Date();
+let dataEmissao = hoje.toLocaleDateString("pt-BR");
 
 let tipoForroTexto = "Sem Forro";
 if(forro=="micro") tipoForroTexto="Microfibra";
 if(forro=="70") tipoForroTexto="Blackout 70%";
 if(forro=="100") tipoForroTexto="Blackout 100%";
-
 /* ======================= */
 /* PRIMEIRA PÁGINA */
 /* ======================= */
@@ -269,6 +279,11 @@ doc.text("PROPOSTA COMERCIAL",105,28,{align:"center"});
 
 doc.setDrawColor(31,60,136);
 doc.line(20,35,190,35);
+  doc.setFontSize(10);
+doc.setTextColor(80,80,80);
+
+doc.text(`Cliente: ${cliente}`,20,42);
+doc.text(`Data de emissão: ${dataEmissao}`,190,42,{align:"right"});
 
 doc.setFontSize(11);
 
