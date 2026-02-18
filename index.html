@@ -366,7 +366,8 @@ doc.text("Franca - São Paulo",105,278,{align:"center"});
 doc.text("WhatsApp: (16) 99428-4571",105,284,{align:"center"});
 doc.text("Instagram: @ateliepatriciareiss",105,290,{align:"center"});
 
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
+let hoje = new Date().toLocaleDateString("pt-BR").replace(/\//g,"-");
+doc.save(`Proposta_${nomeCliente.replace(/\s+/g,"_")}_${hoje}.pdf`);
 }
 
 </script>
