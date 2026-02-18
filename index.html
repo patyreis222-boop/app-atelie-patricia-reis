@@ -86,7 +86,6 @@ margin:6px 0;
 <input type="number" id="barra" value="30">
 <label>Modelo da Cortina</label>
 <select id="modeloCortina">
-<option value="gaze">Gaze</option>
 <option value="macho">Prega Macho</option>
 <option value="wave">Prega Wave</option>
 <option value="americana">Prega Americana</option>
@@ -133,6 +132,7 @@ function calcular(){
 
 let largura=parseFloat(document.getElementById("largura").value);
 let altura=parseFloat(document.getElementById("altura").value);
+ let modeloCortina=document.getElementById("modeloCortina").value;
 let larguraTecido=parseFloat(document.getElementById("larguraTecido").value);
 let barra=parseFloat(document.getElementById("barra").value)/100;
 let forro=document.getElementById("forro").value;
@@ -154,7 +154,15 @@ if(modeloCortina=="ilhos") fatorCortina=2.0;
 if(modeloCortina=="americana") fatorCortina=3.0;
 if(modeloCortina=="macho") fatorCortina=3.5;
 
-let alturasGaze=Math.ceil((largura*fatorCortina)/larguraTecido);
+let fatorCortina = 3.5;
+
+if(modeloCortina == "wave") fatorCortina = 2.2;
+if(modeloCortina == "franzido") fatorCortina = 2.5;
+if(modeloCortina == "ilhos") fatorCortina = 2.0;
+if(modeloCortina == "americana") fatorCortina = 3.0;
+if(modeloCortina == "macho") fatorCortina = 3.5;
+
+let alturasGaze = Math.ceil((largura * fatorCortina) / larguraTecido);
 let metroGaze=alturasGaze*alturaFinal;
 
 let valorGaze=metroGaze*26;
