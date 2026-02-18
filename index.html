@@ -5,29 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ateliê Patrícia Reis – Sistema Técnico</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 body{
 font-family:Arial, sans-serif;
-background:#f7f9fc;
+background:#f4f7fc;
 margin:0;
 padding:20px;
 }
 
 .container{
-max-width:700px;
+max-width:750px;
 margin:auto;
-background:#fff;
-padding:20px;
-border-radius:12px;
-box-shadow:0 4px 15px rgba(0,0,0,0.08);
+background:#ffffff;
+padding:25px;
+border-radius:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
 h1{
 text-align:center;
 color:#1f3c88;
-margin-bottom:20px;
+margin-bottom:25px;
 }
 
 label{
@@ -45,9 +43,9 @@ border:1px solid #ccc;
 }
 
 button{
-margin-top:15px;
+margin-top:25px;
 width:100%;
-padding:12px;
+padding:14px;
 background:#1f3c88;
 color:white;
 border:none;
@@ -57,14 +55,22 @@ cursor:pointer;
 }
 
 .result{
-margin-top:25px;
+margin-top:30px;
 background:#f2f5fb;
-padding:15px;
-border-radius:10px;
+padding:20px;
+border-radius:12px;
 }
 
-.result p{
-margin:6px 0;
+.section{
+margin-bottom:18px;
+}
+
+.section-title{
+color:#1f3c88;
+font-weight:bold;
+margin-top:15px;
+border-bottom:1px solid #dbe3f5;
+padding-bottom:5px;
 }
 </style>
 </head>
@@ -109,16 +115,12 @@ margin:6px 0;
 <input type="number" id="extra" value="0">
 
 <button onclick="calcular()">Calcular</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
 
 <div class="result" id="resultado"></div>
 
 </div>
 
 <script>
-
-let ultimoValorFinal = 0;
-
 function calcular(){
 
 let largura=parseFloat(document.getElementById("largura").value);
@@ -133,6 +135,7 @@ let instalacao=parseFloat(document.getElementById("instalacao").value);
 let extra=parseFloat(document.getElementById("extra").value);
 
 let cabecalho=0.12;
+
 let alturaFinal=altura+barra+cabecalho;
 
 let alturasGaze=Math.ceil((largura*3.5)/larguraTecido);
@@ -153,6 +156,7 @@ if(forro=="100") valorForro=metroForro*31;
 }
 
 let valorEntretela=metroGaze*1.60;
+
 let rodizio=Math.ceil((largura*100)/10);
 if(forro!="sem") rodizio*=2;
 let valorRodizio=rodizio*0.12;
@@ -161,75 +165,59 @@ let valorPresilha=presilhas*1.60;
 let valorTrilho=largura*15;
 
 let custoMateriais=valorGaze+valorForro+valorEntretela+valorRodizio+valorPresilha+valorTrilho;
+
 let maoObra=(forro=="sem"?maoSem:maoCom)*largura;
+
 let valorFinal=custoMateriais+maoObra+instalacao+extra;
 
-ultimoValorFinal = valorFinal;
-
 document.getElementById("resultado").innerHTML=`
-<h2 style="text-align:center;color:#1f3c88;">VALOR FINAL: R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}</h2>
+
+<div class="section">
+<div class="section-title">MEDIDAS</div>
+<p>Altura Original: ${altura.toFixed(2)} m</p>
+<p>Barra: ${(barra*100).toFixed(0)} cm</p>
+<p>Cabeçalho: 12 cm</p>
+<p><strong>Altura Final Utilizada: ${alturaFinal.toFixed(2)} m</strong></p>
+</div>
+
+<div class="section">
+<div class="section-title">GAZE</div>
+<p>Alturas: ${alturasGaze}</p>
+<p>Metragem Total: ${metroGaze.toFixed(2)} m</p>
+<p>Valor: R$ ${valorGaze.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+</div>
+
+<div class="section">
+<div class="section-title">FORRO</div>
+<p>Alturas: ${alturasForro}</p>
+<p>Metragem Total: ${metroForro.toFixed(2)} m</p>
+<p>Valor: R$ ${valorForro.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+</div>
+
+<div class="section">
+<div class="section-title">ACESSÓRIOS</div>
+<p>Entretela: R$ ${valorEntretela.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Rodízios: ${rodizio} un — R$ ${valorRodizio.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Presilhas: ${presilhas} un — R$ ${valorPresilha.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Trilho: R$ ${valorTrilho.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+</div>
+
+<div class="section">
+<div class="section-title">RESUMO FINANCEIRO</div>
+<p>Custo Materiais: R$ ${custoMateriais.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Mão de Obra: R$ ${maoObra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Instalação: R$ ${instalacao.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p>Valor Adicional: R$ ${extra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+</div>
+
+<hr style="border:1px solid #1f3c88; margin-top:20px;">
+
+<h2 style="text-align:center;color:#1f3c88;">
+VALOR FINAL: R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+</h2>
 `;
 }
-
-function gerarPDF(){
-
-if(ultimoValorFinal == 0){
-alert("Calcule o orçamento primeiro.");
-return;
-}
-
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-
-let largura=parseFloat(document.getElementById("largura").value);
-let altura=parseFloat(document.getElementById("altura").value);
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(18);
-doc.setTextColor("#1f3c88");
-doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
-
-doc.setFontSize(13);
-doc.setFont("helvetica","normal");
-doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
-
-doc.setTextColor("#000");
-doc.setFontSize(12);
-
-doc.text(`Medidas originais: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,50);
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(14);
-doc.setTextColor("#1f3c88");
-doc.text("VALOR TOTAL DO PROJETO",105,80,{align:"center"});
-
-doc.setFontSize(20);
-doc.text(`R$ ${ultimoValorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,95,{align:"center"});
-
-doc.addPage();
-
-doc.setFontSize(16);
-doc.setTextColor("#1f3c88");
-doc.text("CONDIÇÕES CONTRATUAIS",105,25,{align:"center"});
-
-doc.setFontSize(11);
-doc.setTextColor("#000");
-
-doc.text("1. Produção iniciada após confirmação do pagamento da entrada.",20,45);
-doc.text("2. Alterações poderão gerar custos adicionais.",20,55);
-doc.text("3. Produto sob medida não possui troca.",20,65);
-
-doc.text("Declaro estar de acordo com os valores e condições descritas.",20,85);
-
-doc.line(20,120,90,120);
-doc.text("Ateliê Patrícia Reis",20,130);
-
-doc.line(120,120,190,120);
-doc.text("Assinatura do Cliente",120,130);
-
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
-}
-
 </script>
+
 </body>
 </html>
