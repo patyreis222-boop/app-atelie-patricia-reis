@@ -203,29 +203,96 @@ if(valorFinalGlobal === 0){
     return;
 }
 
-if(!window.jspdf){
-    alert("Erro ao carregar biblioteca PDF. Atualize a página.");
-    return;
-}
-
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-doc.setFontSize(18);
-doc.text("Ateliê Patrícia Reis", 105, 20, {align:"center"});
+// PEGAR DADOS
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let barra = parseFloat(document.getElementById("barra").value);
+let modeloCortina = document.getElementById("modeloCortina").value;
+let forro = document.getElementById("forro").value;
+let modeloForro = document.getElementById("modeloForro").value;
+
+// ===== PÁGINA 1 =====
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(20);
+doc.setTextColor(31,60,136);
+doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
 
 doc.setFontSize(14);
-doc.text("Proposta Comercial", 105, 30, {align:"center"});
+doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
 
+doc.setTextColor(0,0,0);
+doc.setFont("helvetica","normal");
+doc.setFontSize(12);
+
+doc.text(`Modelo da Cortina: ${modeloCortina}`,20,50);
+
+if(forro !== "sem"){
+doc.text(`Modelo do Forro: ${modeloForro}`,20,60);
+doc.text(`Tipo de Forro: ${
+    forro === "micro" ? "Microfibra" :
+    forro === "70" ? "Blackout 70%" :
+    "Blackout 100%"
+}`,20,70);
+}
+
+doc.text(`Tecido Principal: Gaze de Linho`,20,85);
+doc.text(`Trilho: Trilho de Teto`,20,95);
+doc.text(`Medidas Originais: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,105);
+doc.text(`Barra: ${barra} cm`,20,115);
+
+// BLOCO VALOR
+doc.setFont("helvetica","bold");
 doc.setFontSize(16);
-doc.text("Valor Total do Projeto", 105, 60, {align:"center"});
+doc.setTextColor(31,60,136);
+doc.text("VALOR TOTAL DO PROJETO",105,145,{align:"center"});
 
 doc.setFontSize(22);
-doc.text("R$ " + valorFinalGlobal.toFixed(2), 105, 75, {align:"center"});
+doc.text("R$ " + valorFinalGlobal.toLocaleString("pt-BR",{minimumFractionDigits:2}),105,160,{align:"center"});
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+doc.setTextColor(0,0,0);
+doc.text("Valor referente à confecção, fornecimento de materiais e instalação, conforme especificações acima.",20,175);
+
+// ===== PÁGINA 2 =====
 
 doc.addPage();
-doc.text("Condições Contratuais", 105, 20, {align:"center"});
-doc.text("Produção iniciada após confirmação da entrada.", 20, 40);
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(16);
+doc.setTextColor(31,60,136);
+doc.text("CONDIÇÕES COMERCIAIS",105,25,{align:"center"});
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+doc.setTextColor(0,0,0);
+
+doc.text("• Produção iniciada após confirmação do pagamento da entrada.",20,50);
+doc.text("• Prazo de confecção: até 15 dias úteis após confirmação da entrada.",20,60);
+doc.text("• Alterações poderão gerar custos adicionais.",20,70);
+doc.text("• Produto sob medida não possui troca.",20,80);
+
+doc.text("Declaro estar de acordo com os valores e condições descritas nesta proposta.",20,105);
+
+// LINHA AZUL
+doc.setDrawColor(31,60,136);
+doc.line(20,125,190,125);
+
+// ASSINATURAS
+doc.line(20,150,90,150);
+doc.text("Ateliê Patrícia Reis",20,160);
+
+doc.line(120,150,190,150);
+doc.text("Assinatura do Cliente",120,160);
+
+// RODAPÉ
+doc.setFontSize(9);
+doc.text("Franca - São Paulo",105,280,{align:"center"});
+doc.text("WhatsApp: 16 99428-4571 | Instagram: @ateliepatriciareiss",105,287,{align:"center"});
 
 doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
