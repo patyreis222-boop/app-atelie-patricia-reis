@@ -84,7 +84,21 @@ margin:6px 0;
 
 <label>Barra (cm)</label>
 <input type="number" id="barra" value="30">
+<label>Modelo da Cortina</label>
+<select id="modeloCortina">
+<option value="gaze">Gaze</option>
+<option value="macho">Prega Macho</option>
+<option value="wave">Prega Wave</option>
+<option value="americana">Prega Americana</option>
+<option value="franzido">Franzido</option>
+<option value="ilhos">Ilhós</option>
+</select>
 
+<label>Modelo do Forro</label>
+<select id="modeloForro">
+<option value="painel">Painel</option>
+<option value="franzido">Franzido</option>
+</select>
 <label>Tipo de Forro</label>
 <select id="forro">
 <option value="sem">Sem Forro</option>
@@ -132,7 +146,15 @@ let cabecalho=0.12;
 
 let alturaFinal=altura+barra+cabecalho;
 
-let alturasGaze=Math.ceil((largura*3.5)/larguraTecido);
+let fatorCortina=3.5;
+
+if(modeloCortina=="wave") fatorCortina=2.2;
+if(modeloCortina=="franzido") fatorCortina=2.5;
+if(modeloCortina=="ilhos") fatorCortina=2.0;
+if(modeloCortina=="americana") fatorCortina=3.0;
+if(modeloCortina=="macho") fatorCortina=3.5;
+
+let alturasGaze=Math.ceil((largura*fatorCortina)/larguraTecido);
 let metroGaze=alturasGaze*alturaFinal;
 
 let valorGaze=metroGaze*26;
@@ -142,7 +164,11 @@ let metroForro=0;
 let valorForro=0;
 
 if(forro!="sem"){
-alturasForro=Math.ceil((largura*2)/larguraTecido);
+let fatorForro=2;
+
+if(modeloForro=="franzido") fatorForro=2.5;
+
+alturasForro=Math.ceil((largura*fatorForro)/larguraTecido);
 metroForro=alturasForro*alturaFinal;
 
 if(forro=="micro") valorForro=metroForro*13;
@@ -199,7 +225,8 @@ const doc = new jsPDF();
 let largura = parseFloat(document.getElementById("largura").value);
 let altura = parseFloat(document.getElementById("altura").value);
 let forro = document.getElementById("forro").value;
-
+let modeloCortina=document.getElementById("modeloCortina").value;
+let modeloForro=document.getElementById("modeloForro").value;
 let extra = parseFloat(document.getElementById("extra").value) || 0;
 let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
 let maoSem = parseFloat(document.getElementById("maoSem").value) || 0;
