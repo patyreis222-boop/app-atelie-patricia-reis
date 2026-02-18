@@ -2,225 +2,191 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Ateliê Patrícia Reis</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ateliê Patrícia Reis – Sistema Técnico</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f9;
-    max-width:800px;
-    margin:auto;
-    padding:20px;
+font-family:Arial, sans-serif;
+background:#f7f9fc;
+margin:0;
+padding:20px;
 }
+
+.container{
+max-width:700px;
+margin:auto;
+background:#fff;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
 h1{
-    text-align:center;
-    color:#6f8fb3;
+text-align:center;
+color:#1f3c88;
+margin-bottom:20px;
 }
+
+label{
+font-weight:bold;
+display:block;
+margin-top:15px;
+}
+
 input, select{
-    width:100%;
-    padding:6px;
-    margin-bottom:10px;
+width:100%;
+padding:8px;
+margin-top:5px;
+border-radius:6px;
+border:1px solid #ccc;
 }
+
 button{
-    padding:8px 15px;
-    border:none;
-    background:#6f8fb3;
-    color:white;
-    cursor:pointer;
+margin-top:20px;
+width:100%;
+padding:12px;
+background:#1f3c88;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
 }
-.resultado{
-    background:white;
-    padding:15px;
-    margin-top:20px;
-    border-radius:8px;
+
+.result{
+margin-top:25px;
+background:#f2f5fb;
+padding:15px;
+border-radius:10px;
 }
-.total{
-    font-size:22px;
-    color:#6f8fb3;
-    font-weight:bold;
+
+.result p{
+margin:6px 0;
 }
 </style>
 </head>
 
 <body>
-
+<div class="container">
 <h1>Ateliê Patrícia Reis</h1>
 
-<h3>Dados do Projeto</h3>
+<label>Largura da Cortina (m)</label>
+<input type="number" id="largura" step="0.01">
 
-Cliente:
-<input id="cliente">
+<label>Altura da Cortina (m)</label>
+<input type="number" id="altura" step="0.01">
 
-Largura (m):
-<input id="largura" type="number" step="0.01">
+<label>Largura do Tecido (m)</label>
+<input type="number" id="larguraTecido" value="3" step="0.01">
 
-Altura (m):
-<input id="altura" type="number" step="0.01">
+<label>Barra (cm)</label>
+<input type="number" id="barra" value="30">
 
-Barra (m):
-<input id="barra" type="number" step="0.01">
-
-Modelo do forro:
-<select id="forroModelo">
-<option value="com">Com forro</option>
-<option value="sem">Sem forro</option>
+<label>Tipo de Forro</label>
+<select id="forro">
+<option value="sem">Sem Forro</option>
+<option value="micro">Microfibra</option>
+<option value="70">Blackout 70%</option>
+<option value="100">Blackout 100%</option>
 </select>
 
-Preço Gaze (m):
-<input id="precoGaze" type="number" step="0.01">
+<label>Quantidade de Presilhas</label>
+<input type="number" id="presilhas" value="7">
 
-Preço Forro (m):
-<input id="precoForro" type="number" step="0.01">
+<label>Mão de Obra (Sem Forro) R$</label>
+<input type="number" id="maoSem" value="150">
 
-Preço Entretela (m):
-<input id="precoEntretela" type="number" step="0.01">
+<label>Mão de Obra (Com Forro) R$</label>
+<input type="number" id="maoCom" value="200">
 
-Preço Rodízio (un):
-<input id="precoRodizio" type="number" step="0.01">
+<label>Instalação R$</label>
+<input type="number" id="instalacao" value="0">
 
-Quantidade Prisilha:
-<input id="qtdPrisilha" type="number">
+<label>Valor Adicional R$</label>
+<input type="number" id="extra" value="0">
 
-Preço Prisilha (un):
-<input id="precoPrisilha" type="number" step="0.01">
-
-Preço Trilho (m):
-<input id="precoTrilho" type="number" step="0.01">
-
-Mão de obra sem forro (m):
-<input id="maoSem" type="number" step="0.01">
-
-Mão de obra com forro (m):
-<input id="maoCom" type="number" step="0.01">
-
-Instalação:
-<input id="instalacao" type="number" step="0.01">
-
-<br>
 <button onclick="calcular()">Calcular</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
 
-<div class="resultado" id="resultado"></div>
+<div class="result" id="resultado"></div>
+
+</div>
 
 <script>
-
-let totalProjeto = 0;
-
 function calcular(){
 
-let largura = parseFloat(largura.value);
-let altura = parseFloat(altura.value);
-let barra = parseFloat(barra.value);
-let modeloForro = forroModelo.value;
+let largura=parseFloat(document.getElementById("largura").value);
+let altura=parseFloat(document.getElementById("altura").value);
+let larguraTecido=parseFloat(document.getElementById("larguraTecido").value);
+let barra=parseFloat(document.getElementById("barra").value)/100;
+let forro=document.getElementById("forro").value;
+let presilhas=parseFloat(document.getElementById("presilhas").value);
+let maoSem=parseFloat(document.getElementById("maoSem").value);
+let maoCom=parseFloat(document.getElementById("maoCom").value);
+let instalacao=parseFloat(document.getElementById("instalacao").value);
+let extra=parseFloat(document.getElementById("extra").value);
 
-let precoGaze = parseFloat(precoGaze.value);
-let precoForro = parseFloat(precoForro.value);
-let precoEntretela = parseFloat(precoEntretela.value);
-let precoRodizio = parseFloat(precoRodizio.value);
-let qtdPrisilha = parseFloat(qtdPrisilha.value);
-let precoPrisilha = parseFloat(precoPrisilha.value);
-let precoTrilho = parseFloat(precoTrilho.value);
-let maoSem = parseFloat(maoSem.value);
-let maoCom = parseFloat(maoCom.value);
-let instalacao = parseFloat(instalacao.value);
+let cabecalho=0.12;
 
-let alturaFinal = altura + barra;
+let alturaFinal=altura+barra+cabecalho;
 
-let metroGaze = largura * alturaFinal;
-let valorGaze = metroGaze * precoGaze;
+let alturasGaze=Math.ceil((largura*3.5)/larguraTecido);
+let metroGaze=alturasGaze*alturaFinal;
 
-let metroForro = modeloForro === "com" ? largura * alturaFinal : 0;
-let valorForro = metroForro * precoForro;
+let valorGaze=metroGaze*26;
 
-let valorEntretela = largura * precoEntretela;
+let alturasForro=0;
+let metroForro=0;
+let valorForro=0;
 
-let qtdRodizio = Math.ceil((largura * 100) / 10);
-if(modeloForro === "com") qtdRodizio *= 2;
+if(forro!="sem"){
+alturasForro=Math.ceil((largura*2)/larguraTecido);
+metroForro=alturasForro*alturaFinal;
 
-let valorRodizio = qtdRodizio * precoRodizio;
+if(forro=="micro") valorForro=metroForro*13;
+if(forro=="70") valorForro=metroForro*23;
+if(forro=="100") valorForro=metroForro*31;
+}
 
-let valorPrisilha = qtdPrisilha * precoPrisilha;
+let valorEntretela=metroGaze*1.60;
 
-let valorTrilho = largura * precoTrilho;
+let rodizio=Math.ceil((largura*100)/10);
+if(forro!="sem") rodizio*=2;
+let valorRodizio=rodizio*0.12;
 
-let valorMao = modeloForro === "com"
-? largura * maoCom
-: largura * maoSem;
+let valorPresilha=presilhas*1.60;
 
-let custoMateriais =
-valorGaze +
-valorForro +
-valorEntretela +
-valorRodizio +
-valorPrisilha +
-valorTrilho;
+let valorTrilho=largura*15;
 
-totalProjeto =
-custoMateriais +
-valorMao +
-instalacao;
+let custoMateriais=valorGaze+valorForro+valorEntretela+valorRodizio+valorPresilha+valorTrilho;
 
-resultado.innerHTML = `
-<h3>Detalhamento Técnico</h3>
+let maoObra=(forro=="sem"?maoSem:maoCom)*largura;
 
-Altura final: ${alturaFinal.toFixed(2)} m<br><br>
+let valorFinal=custoMateriais+maoObra+instalacao+extra;
 
-Metro gaze: ${metroGaze.toFixed(2)} m — R$ ${valorGaze.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Metro forro: ${metroForro.toFixed(2)} m — R$ ${valorForro.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Entretela: R$ ${valorEntretela.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Rodízios: ${qtdRodizio} — R$ ${valorRodizio.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Prisilha: R$ ${valorPrisilha.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Trilho: R$ ${valorTrilho.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Mão de obra: R$ ${valorMao.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-Instalação: R$ ${instalacao.toLocaleString("pt-BR",{minimumFractionDigits:2})}<br><br>
-
-<div class="total">
-Valor Final: R$ ${totalProjeto.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-</div>
+document.getElementById("resultado").innerHTML=`
+<p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
+<p><strong>Alturas Gaze:</strong> ${alturasGaze}</p>
+<p><strong>Metragem Gaze:</strong> ${metroGaze.toFixed(2)} m</p>
+<p><strong>Valor Gaze:</strong> R$ ${valorGaze.toFixed(2)}</p>
+<hr>
+<p><strong>Alturas Forro:</strong> ${alturasForro}</p>
+<p><strong>Metragem Forro:</strong> ${metroForro.toFixed(2)} m</p>
+<p><strong>Valor Forro:</strong> R$ ${valorForro.toFixed(2)}</p>
+<hr>
+<p><strong>Entretela:</strong> R$ ${valorEntretela.toFixed(2)}</p>
+<p><strong>Rodízio (${rodizio} un):</strong> R$ ${valorRodizio.toFixed(2)}</p>
+<p><strong>Presilhas:</strong> R$ ${valorPresilha.toFixed(2)}</p>
+<p><strong>Trilho:</strong> R$ ${valorTrilho.toFixed(2)}</p>
+<hr>
+<p><strong>Custo Total Materiais:</strong> R$ ${custoMateriais.toFixed(2)}</p>
+<p><strong>Mão de Obra:</strong> R$ ${maoObra.toFixed(2)}</p>
+<p><strong>Instalação:</strong> R$ ${instalacao.toFixed(2)}</p>
+<p><strong>Valor Adicional:</strong> R$ ${extra.toFixed(2)}</p>
+<hr>
+<h2 style="text-align:center;color:#1f3c88;">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
 `;
-
 }
-
-async function gerarPDF(){
-
-if(!totalProjeto){
-alert("Calcule primeiro!");
-return;
-}
-
-const { jsPDF } = window.jspdf;
-let doc = new jsPDF();
-
-doc.setFontSize(18);
-doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
-
-doc.setFontSize(12);
-doc.text(`Cliente: ${cliente.value}`,20,40);
-
-doc.setFontSize(14);
-doc.text("VALOR TOTAL DO PROJETO",105,80,{align:"center"});
-
-doc.setFontSize(20);
-doc.text(`R$ ${totalProjeto.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,95,{align:"center"});
-
-doc.addPage();
-
-doc.setFontSize(12);
-doc.text("Francа - São Paulo",105,250,{align:"center"});
-doc.text("WhatsApp: 16994284571 | @Ateliepatriciareiss",105,257,{align:"center"});
-
-doc.save("orcamento.pdf");
-
-}
-
 </script>
 
 </body>
