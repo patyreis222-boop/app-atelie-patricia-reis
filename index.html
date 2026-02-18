@@ -237,6 +237,7 @@ const doc = new jsPDF();
 
 let largura=parseFloat(document.getElementById("largura").value);
 let altura=parseFloat(document.getElementById("altura").value);
+let barra=document.getElementById("barra").value;
 let modeloCortina=document.getElementById("modeloCortina").value;
 let modeloForro=document.getElementById("modeloForro").value;
 let tipoForro=document.getElementById("forro").value;
@@ -246,56 +247,90 @@ let validade=document.getElementById("validade").value;
 let valorEntrada=ultimoValorFinal*(entradaPercentual/100);
 let saldo=ultimoValorFinal-valorEntrada;
 
-doc.setFontSize(18);
+/* ---------- PÁGINA 1 ---------- */
+
+doc.setFontSize(20);
 doc.setTextColor("#1f3c88");
 doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
-doc.setFontSize(13);
+
+doc.setFontSize(14);
 doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
+
+doc.setDrawColor("#1f3c88");
+doc.line(20,35,190,35);
 
 doc.setFontSize(11);
 doc.setTextColor("#000");
 
 doc.text(`Modelo da Cortina: ${modeloCortina}`,20,50);
 doc.text(`Modelo do Forro: ${tipoForro=="sem"?"Sem Forro":modeloForro}`,20,60);
-doc.text(`Medidas: ${largura.toFixed(2)}m x ${altura.toFixed(2)}m`,20,75);
+
+doc.text(`Altura e Largura: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,75);
+
+doc.text("Tipo de Tecido Principal: Gaze de Linho",20,90);
+
+if(tipoForro!="sem"){
+let nomeForro = tipoForro=="micro"?"Microfibra":
+                 tipoForro=="70"?"Blackout 70%":
+                 "Blackout 100%";
+doc.text(`Tipo de Tecido Forro: ${nomeForro}`,20,100);
+}else{
+doc.text("Tipo de Tecido Forro: Não Aplicável",20,100);
+}
+
+doc.text(`Tamanho da Barra: ${barra} cm`,20,115);
+doc.text("Trilho de Teto",20,125);
 
 doc.setFontSize(16);
 doc.setTextColor("#1f3c88");
-doc.text("VALOR TOTAL DO PROJETO",105,100,{align:"center"});
+doc.text("VALOR TOTAL DO PROJETO",105,150,{align:"center"});
+
 doc.setFontSize(22);
-doc.text(`R$ ${ultimoValorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,115,{align:"center"});
+doc.text(`R$ ${ultimoValorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,165,{align:"center"});
 
 doc.setFontSize(11);
 doc.setTextColor("#000");
 
-doc.text(`Entrada (${entradaPercentual}%): R$ ${valorEntrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,140);
-doc.text(`Saldo na entrega: R$ ${saldo.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,150);
+doc.text(`Entrada (${entradaPercentual}%): R$ ${valorEntrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,185);
+doc.text(`Saldo na Entrega: R$ ${saldo.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,195);
+
+/* ---------- PÁGINA 2 ---------- */
 
 doc.addPage();
 
-doc.setFontSize(16);
+doc.setFontSize(18);
 doc.setTextColor("#1f3c88");
 doc.text("CONDIÇÕES COMERCIAIS",105,25,{align:"center"});
+
+doc.line(20,32,190,32);
 
 doc.setFontSize(11);
 doc.setTextColor("#000");
 
-doc.text("Produção iniciada após confirmação do pagamento da entrada.",20,50);
-doc.text("Alterações poderão gerar custos adicionais.",20,60);
-doc.text("Produto sob medida não possui troca.",20,70);
-doc.text(`Validade da proposta: ${validade} dias.`,20,80);
-doc.text("Aceitamos Pix, dinheiro e cartão de crédito.",20,90);
-doc.text("WhatsApp: (16) 99428-4571",20,100);
+doc.text("A produção será iniciada após a confirmação do pagamento da entrada.",20,50);
+doc.text("O prazo estimado poderá variar conforme volume e especificações técnicas.",20,60);
+doc.text("Alterações solicitadas após aprovação poderão gerar reajustes de valores.",20,70);
+doc.text("Produto confeccionado sob medida não possui troca ou devolução.",20,80);
+doc.text(`Validade desta proposta: ${validade} dias.`,20,90);
 
-doc.line(20,200,90,200);
-doc.text("Patrícia Reis",20,210);
+doc.text("Aceitamos Pix, dinheiro e cartão de crédito.",20,105);
+doc.text("WhatsApp: (16) 99428-4571",20,115);
 
-doc.line(120,200,190,200);
-doc.text("Assinatura do Cliente",120,210);
+doc.text(" ",20,130);
+
+doc.text("Ao assinar esta proposta, o cliente declara estar ciente e de acordo",20,145);
+doc.text("com todas as especificações técnicas e condições comerciais acima descritas.",20,155);
+doc.text("Qualquer alteração posterior poderá implicar em ajustes proporcionais",20,165);
+doc.text("de valores e prazos.",20,175);
+
+doc.line(20,210,90,210);
+doc.text("Ateliê Patrícia Reis",20,220);
+
+doc.line(120,210,190,210);
+doc.text("Assinatura do Cliente",120,220);
 
 doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
-
 </script>
 </body>
 </html>
