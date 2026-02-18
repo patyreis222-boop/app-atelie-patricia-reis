@@ -331,13 +331,17 @@ doc.text("Ateliê Patrícia Reis",20,168);
 doc.line(120,160,190,160);
 doc.text("Assinatura do Cliente",120,168);
 
+// Linha superior do rodapé
+doc.setDrawColor(31,60,136);
+doc.line(20,270,190,270);
+
+// Rodapé centralizado e seguro
 doc.setFontSize(9);
-doc.setTextColor(80,80,80);
+doc.setTextColor(90,90,90);
 
-doc.text("Franca - São Paulo",20,285);
-doc.text("WhatsApp: (16) 99428-4571",20,291);
-doc.text("Instagram: @ateliepatriciareiss",20,297);
-
+doc.text("Franca - São Paulo",105,278,{align:"center"});
+doc.text("WhatsApp: (16) 99428-4571",105,284,{align:"center"});
+doc.text("Instagram: @ateliepatriciareiss",105,290,{align:"center"});
 doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
 </script>
