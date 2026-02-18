@@ -131,16 +131,189 @@ margin:15px 0;
 
 <script>
 
+let ultimoVa
+
+  <script>
+
 let ultimoValorFinal = 0;
 let dadosPDF = {};
 
+function getNumber(id){
+let value = parseFloat(document.getElementById(id).value);
+return isNaN(value) ? 0 : value;
+}
+
 function calcular(){
 
-let largura=parseFloat(document.getElementById("largura").value);
-let altura=parseFloat(document.getElementById("altura").value);
-let larguraTecido=parseFloat(document.getElementById("larguraTecido").value);
-let barra=parseFloat(document.getElementById("barra").value)/100;
-let forro=document.getElementById("forro").value;
-let modeloCortina=document.getElementById("modeloCortina").value;
-let modeloForro=document.getElementById("modeloForro").value;
-let presilhas=parseFloat(document.getElementById("presilhas
+let largura = getNumber("largura");
+let altura = getNumber("altura");
+let larguraTecido = getNumber("larguraTecido");
+let barra = getNumber("barra") / 100;
+let forro = document.getElementById("forro").value;
+let modeloCortina = document.getElementById("modeloCortina").value;
+let modeloForro = document.getElementById("modeloForro").value;
+let presilhas = getNumber("presilhas");
+let maoSem = getNumber("maoSem");
+let maoCom = getNumber("maoCom");
+let instalacao = getNumber("instalacao");
+let extra = getNumber("extra");
+
+if(largura === 0 || altura === 0){
+alert("Preencha largura e altura.");
+return;
+}
+
+let cabecalho = 0.12;
+let alturaFinal = altura + barra + cabecalho;
+
+/* ---------------- GAZE ---------------- */
+
+let alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
+let metroGaze = alturasGaze * alturaFinal;
+let valorGaze = metroGaze * 26;
+
+/* ---------------- FORRO ---------------- */
+
+let alturasForro = 0;
+let metroForro = 0;
+let valorForro = 0;
+
+if(forro !== "sem"){
+alturasForro = Math.ceil((largura * 2) / larguraTecido);
+metroForro = alturasForro * alturaFinal;
+
+if(forro === "micro") valorForro = metroForro * 13;
+if(forro === "70") valorForro = metroForro * 23;
+if(forro === "100") valorForro = metroForro * 31;
+}
+
+/* ---------------- ACESSÓRIOS ---------------- */
+
+let valorEntretela = metroGaze * 1.60;
+
+let rodizio = Math.ceil((largura * 100) / 10);
+if(forro !== "sem") rodizio *= 2;
+let valorRodizio = rodizio * 0.12;
+
+let valorPresilha = presilhas * 1.60;
+let valorTrilho = largura * 15;
+
+/* ---------------- TOTAIS ---------------- */
+
+let custoMateriais = valorGaze + valorForro + valorEntretela + valorRodizio + valorPresilha + valorTrilho;
+let maoObra = (forro === "sem" ? maoSem : maoCom) * largura;
+let valorFinal = custoMateriais + maoObra + instalacao + extra;
+
+ultimoValorFinal = valorFinal;
+
+dadosPDF = {
+largura,
+altura,
+modeloCortina,
+modeloForro,
+forro,
+valorFinal
+};
+
+document.getElementById("resultado").innerHTML = `
+
+<h3>DETALHAMENTO TÉCNICO</h3>
+
+<p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
+<p><strong>Alturas Gaze:</strong> ${alturasGaze}</p>
+<p><strong>Metragem Gaze:</strong> ${metroGaze.toFixed(2)} m</p>
+<p><strong>Valor Gaze:</strong> R$ ${valorGaze.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<hr>
+
+<p><strong>Alturas Forro:</strong> ${alturasForro}</p>
+<p><strong>Metragem Forro:</strong> ${metroForro.toFixed(2)} m</p>
+<p><strong>Valor Forro:</strong> R$ ${valorForro.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<hr>
+
+<p><strong>Entretela:</strong> R$ ${valorEntretela.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Rodízio (${rodizio} un):</strong> R$ ${valorRodizio.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Presilhas:</strong> R$ ${valorPresilha.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Trilho:</strong> R$ ${valorTrilho.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<hr>
+
+<p><strong>Custo Total Materiais:</strong> R$ ${custoMateriais.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Mão de Obra:</strong> R$ ${maoObra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Instalação:</strong> R$ ${instalacao.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Valor Adicional:</strong> R$ ${extra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<h2 style="text-align:center;color:#1f3c88;">
+VALOR FINAL: R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+</h2>
+`;
+}
+
+/* ================= PDF ================= */
+
+function gerarPDF(){
+
+if(ultimoValorFinal === 0){
+alert("Calcule o orçamento primeiro.");
+return;
+}
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(20);
+doc.setTextColor(31,60,136);
+doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
+
+doc.setFontSize(13);
+doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(12);
+doc.setTextColor(0,0,0);
+
+doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,50);
+
+if(dadosPDF.forro !== "sem"){
+doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,60);
+}
+
+doc.text(`Medidas Originais: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,75);
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(15);
+doc.setTextColor(31,60,136);
+doc.text("VALOR TOTAL DO PROJETO",105,100,{align:"center"});
+
+doc.setFontSize(22);
+doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,115,{align:"center"});
+
+doc.addPage();
+
+doc.setFontSize(16);
+doc.setTextColor(31,60,136);
+doc.text("CONDIÇÕES COMERCIAIS",105,25,{align:"center"});
+
+doc.setFontSize(11);
+doc.setTextColor(0,0,0);
+
+doc.text("Produção iniciada após confirmação do pagamento.",20,45);
+doc.text("Prazo médio de confecção: até 15 dias úteis.",20,55);
+doc.text("Produto sob medida não possui troca.",20,65);
+
+doc.line(20,120,90,120);
+doc.text("Ateliê Patrícia Reis",20,130);
+
+doc.line(120,120,190,120);
+doc.text("Assinatura do Cliente",120,130);
+
+doc.setFontSize(9);
+doc.text("Franca – São Paulo",105,280,{align:"center"});
+doc.text("WhatsApp: 16 99428-4571 | Instagram: @ateliepatriciareiss",105,286,{align:"center"});
+
+doc.save("Proposta_Atelie_Patricia_Reis.pdf");
+}
+
+</script>
