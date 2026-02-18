@@ -239,73 +239,83 @@ return;
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
 
-// ===== NOVO BLOCO PROFISSIONAL =====
-let cliente = document.getElementById("cliente").value || "Cliente";
-let dataAtual = new Date();
-let dataFormatada = dataAtual.toLocaleDateString("pt-BR");
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let barra = document.getElementById("barra").value;
+let modeloCortina = document.getElementById("modeloCortina").value;
+let modeloForro = document.getElementById("modeloForro").value;
+let forro = document.getElementById("forro").value;
+let nomeCliente = document.getElementById("nomeCliente").value;
+let percentualEntrada = parseFloat(document.getElementById("entradaPercentual").value);
+let validade = document.getElementById("validade").value;
 
-// Cabeçalho principal
+let dataHoje = new Date().toLocaleDateString("pt-BR");
+
+let valorEntrada = (ultimoValorFinal * percentualEntrada) / 100;
+let valorRestante = ultimoValorFinal - valorEntrada;
+
+let tipoForroTexto = "Sem Forro";
+if(forro=="micro") tipoForroTexto="Microfibra";
+if(forro=="70") tipoForroTexto="Blackout 70%";
+if(forro=="100") tipoForroTexto="Blackout 100%";
+
+/* ===================== */
+/* PRIMEIRA PÁGINA */
+/* ===================== */
+
 doc.setFont("helvetica","bold");
-doc.setFontSize(20);
+doc.setFontSize(18);
 doc.setTextColor(31,60,136);
 doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
 
-// Linha elegante
-doc.setDrawColor(31,60,136);
-doc.line(20,28,190,28);
-
-// Cliente em destaque
-doc.setFontSize(14);
-doc.setFont("helvetica","bold");
-doc.setTextColor(0,0,0);
-doc.text(`Cliente: ${cliente.toUpperCase()}`,20,40);
-
-// Data emissão
-doc.setFontSize(10);
+doc.setFontSize(12);
 doc.setFont("helvetica","normal");
-doc.setTextColor(90,90,90);
-doc.text(`Data de emissão: ${dataFormatada}`,20,48);
-doc.line(20,35,190,35);
-  doc.setFontSize(10);
-doc.setTextColor(80,80,80);
+doc.setTextColor(0,0,0);
+doc.text("PROPOSTA COMERCIAL",105,28,{align:"center"});
 
-doc.text(`Cliente: ${cliente}`,20,42);
-doc.text(`Data de emissão: ${dataEmissao}`,190,42,{align:"right"});
+doc.setDrawColor(31,60,136);
+doc.line(20,35,190,35);
 
 doc.setFontSize(11);
 
-doc.text(`Modelo da cortina: ${modeloCortina}`,20,50);
-doc.text(`Modelo do forro: ${forro!="sem" ? modeloForro : "Sem forro"}`,20,58);
+doc.text("Cliente:",20,48);
+doc.setFont("helvetica","bold");
+doc.text(nomeCliente || "Não informado",20,55);
 
-doc.text(`Altura e largura: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,66);
-doc.text(`Tipo de tecido principal: Gaze de Linho`,20,74);
-doc.text(`Tipo de tecido do forro: ${tipoForroTexto}`,20,82);
-doc.text(`Tamanho da barra: ${barra} cm`,20,90);
-doc.text(`Trilho: Trilho de teto`,20,98);
+doc.setFont("helvetica","normal");
+doc.text(`Emissão: ${dataHoje}`,150,48);
+
+doc.text(`Modelo da cortina: ${modeloCortina}`,20,70);
+doc.text(`Modelo do forro: ${forro!="sem" ? modeloForro : "Sem forro"}`,20,78);
+doc.text(`Medidas: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,86);
+doc.text(`Tecido principal: Gaze de Linho`,20,94);
+doc.text(`Tecido do forro: ${tipoForroTexto}`,20,102);
+doc.text(`Barra: ${barra} cm`,20,110);
+doc.text(`Trilho: Trilho de teto`,20,118);
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(14);
 doc.setTextColor(31,60,136);
-doc.text("VALOR TOTAL DO PROJETO",105,120,{align:"center"});
+doc.text("VALOR TOTAL DO PROJETO",105,135,{align:"center"});
 
 doc.setFontSize(20);
-doc.text(`R$ ${ultimoValorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,135,{align:"center"});
+doc.text(`R$ ${ultimoValorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,148,{align:"center"});
 
 doc.setFont("helvetica","normal");
 doc.setFontSize(11);
 doc.setTextColor(0,0,0);
 
-doc.text(`Entrada (${percentualEntrada}%): R$ ${valorEntrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,155);
-doc.text(`Saldo na entrega: R$ ${valorRestante.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,163);
+doc.text(`Entrada (${percentualEntrada}%): R$ ${valorEntrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,165);
+doc.text(`Saldo na entrega: R$ ${valorRestante.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,173);
 
-doc.text(`Validade da proposta: ${validade} dias.`,20,175);
-doc.text(`Prazo de confecção: 10 dias úteis após confirmação da entrada.`,20,183);
+doc.text(`Validade da proposta: ${validade} dias.`,20,185);
+doc.text(`Prazo de confecção: 10 dias úteis após confirmação da entrada.`,20,193);
 
 doc.addPage();
 
-/* ======================= */
+/* ===================== */
 /* SEGUNDA PÁGINA */
-/* ======================= */
+/* ===================== */
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(16);
@@ -316,13 +326,13 @@ doc.setFont("helvetica","normal");
 doc.setFontSize(11);
 doc.setTextColor(0,0,0);
 
-doc.text("1. A produção será iniciada somente após a confirmação do pagamento da entrada.",20,45);
-doc.text("2. Alterações após aprovação poderão gerar ajustes no valor final.",20,55);
+doc.text("1. A produção será iniciada após confirmação do pagamento da entrada.",20,45);
+doc.text("2. Alterações após aprovação poderão gerar ajuste no valor final.",20,55);
 doc.text("3. Produto confeccionado sob medida não possui troca ou devolução.",20,65);
-doc.text("4. A instalação está inclusa conforme especificação técnica apresentada.",20,75);
+doc.text("4. Instalação inclusa conforme especificação técnica apresentada.",20,75);
 
-doc.text("Ao assinar este documento, o cliente declara estar de acordo com as",20,95);
-doc.text("especificações técnicas, valores e condições comerciais aqui descritas.",20,103);
+doc.text("Ao assinar este documento, o cliente declara estar de acordo com",20,95);
+doc.text("todas as especificações técnicas, valores e condições aqui descritas.",20,103);
 
 doc.setDrawColor(31,60,136);
 doc.line(20,130,190,130);
@@ -333,17 +343,16 @@ doc.text("Ateliê Patrícia Reis",20,168);
 doc.line(120,160,190,160);
 doc.text("Assinatura do Cliente",120,168);
 
-// Linha superior do rodapé
+/* Rodapé */
 doc.setDrawColor(31,60,136);
 doc.line(20,270,190,270);
 
-// Rodapé centralizado e seguro
 doc.setFontSize(9);
 doc.setTextColor(90,90,90);
-
 doc.text("Franca - São Paulo",105,278,{align:"center"});
 doc.text("WhatsApp: (16) 99428-4571",105,284,{align:"center"});
 doc.text("Instagram: @ateliepatriciareiss",105,290,{align:"center"});
+
 doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
 </script>
