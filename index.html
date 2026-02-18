@@ -59,7 +59,7 @@ cursor:pointer;
 .result{
 margin-top:25px;
 background:#f1f4fa;
-padding:15px;
+padding:18px;
 border-radius:10px;
 }
 
@@ -124,7 +124,7 @@ margin:15px 0;
 <input type="number" id="extra" value="0">
 
 <button onclick="calcular()">Calcular</button>
-<button onclick="gerarPDF()">Gerar PDF Comercial</button>
+<button onclick="gerarPDF()">Gerar PDF</button>
 
 <div class="result" id="resultado"></div>
 </div>
@@ -134,71 +134,57 @@ margin:15px 0;
 let ultimoValorFinal = 0;
 let dadosPDF = {};
 
-function getNumber(id){
-let value = parseFloat(document.getElementById(id).value);
-return isNaN(value) ? 0 : value;
-}
-
 function calcular(){
 
-let largura = getNumber("largura");
-let altura = getNumber("altura");
-let larguraTecido = getNumber("larguraTecido");
-let barra = getNumber("barra") / 100;
-let forro = document.getElementById("forro").value;
-let modeloCortina = document.getElementById("modeloCortina").value;
-let modeloForro = document.getElementById("modeloForro").value;
-let presilhas = getNumber("presilhas");
-let maoSem = getNumber("maoSem");
-let maoCom = getNumber("maoCom");
-let instalacao = getNumber("instalacao");
-let extra = getNumber("extra");
+let largura=parseFloat(document.getElementById("largura").value);
+let altura=parseFloat(document.getElementById("altura").value);
+let larguraTecido=parseFloat(document.getElementById("larguraTecido").value);
+let barra=parseFloat(document.getElementById("barra").value)/100;
+let forro=document.getElementById("forro").value;
+let modeloCortina=document.getElementById("modeloCortina").value;
+let modeloForro=document.getElementById("modeloForro").value;
+let presilhas=parseFloat(document.getElementById("presilhas").value);
+let maoSem=parseFloat(document.getElementById("maoSem").value);
+let maoCom=parseFloat(document.getElementById("maoCom").value);
+let instalacao=parseFloat(document.getElementById("instalacao").value);
+let extra=parseFloat(document.getElementById("extra").value);
 
-if(largura === 0 || altura === 0){
-alert("Preencha largura e altura.");
-return;
+let cabecalho=0.12;
+let alturaFinal=altura+barra+cabecalho;
+
+let alturasGaze=Math.ceil((largura*3.5)/larguraTecido);
+let metroGaze=alturasGaze*alturaFinal;
+let valorGaze=metroGaze*26;
+
+let alturasForro=0;
+let metroForro=0;
+let valorForro=0;
+
+if(forro!="sem"){
+alturasForro=Math.ceil((largura*2)/larguraTecido);
+metroForro=alturasForro*alturaFinal;
+
+if(forro=="micro") valorForro=metroForro*13;
+if(forro=="70") valorForro=metroForro*23;
+if(forro=="100") valorForro=metroForro*31;
 }
 
-let cabecalho = 0.12;
-let alturaFinal = altura + barra + cabecalho;
+let valorEntretela=metroGaze*1.60;
 
-/* GAZE */
-let alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
-let metroGaze = alturasGaze * alturaFinal;
-let valorGaze = metroGaze * 26;
+let rodizio=Math.ceil((largura*100)/10);
+if(forro!="sem") rodizio*=2;
+let valorRodizio=rodizio*0.12;
 
-/* FORRO */
-let alturasForro = 0;
-let metroForro = 0;
-let valorForro = 0;
+let valorPresilha=presilhas*1.60;
+let valorTrilho=largura*15;
 
-if(forro !== "sem"){
-alturasForro = Math.ceil((largura * 2) / larguraTecido);
-metroForro = alturasForro * alturaFinal;
+let custoMateriais=valorGaze+valorForro+valorEntretela+valorRodizio+valorPresilha+valorTrilho;
+let maoObra=(forro=="sem"?maoSem:maoCom)*largura;
+let valorFinal=custoMateriais+maoObra+instalacao+extra;
 
-if(forro === "micro") valorForro = metroForro * 13;
-if(forro === "70") valorForro = metroForro * 23;
-if(forro === "100") valorForro = metroForro * 31;
-}
+ultimoValorFinal=valorFinal;
 
-/* ACESSÓRIOS */
-let valorEntretela = metroGaze * 1.60;
-
-let rodizio = Math.ceil((largura * 100) / 10);
-if(forro !== "sem") rodizio *= 2;
-let valorRodizio = rodizio * 0.12;
-
-let valorPresilha = presilhas * 1.60;
-let valorTrilho = largura * 15;
-
-/* TOTAIS */
-let custoMateriais = valorGaze + valorForro + valorEntretela + valorRodizio + valorPresilha + valorTrilho;
-let maoObra = (forro === "sem" ? maoSem : maoCom) * largura;
-let valorFinal = custoMateriais + maoObra + instalacao + extra;
-
-ultimoValorFinal = valorFinal;
-
-dadosPDF = {
+dadosPDF={
 largura,
 altura,
 modeloCortina,
@@ -207,7 +193,7 @@ forro,
 valorFinal
 };
 
-document.getElementById("resultado").innerHTML = `
+document.getElementById("resultado").innerHTML=`
 <h3>DETALHAMENTO TÉCNICO</h3>
 
 <p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
@@ -241,83 +227,54 @@ VALOR FINAL: R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}
 `;
 }
 
-/* ================= PDF ================= */
-
 function gerarPDF(){
 
-if(ultimoValorFinal === 0){
+if(ultimoValorFinal===0){
 alert("Calcule o orçamento primeiro.");
 return;
 }
 
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF();
-
-let azul = [31,60,136];
-
-// ================== PÁGINA 1 ==================
+let azul=[31,60,136];
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(22);
 doc.setTextColor(...azul);
 doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
 
-doc.setFont("helvetica","normal");
 doc.setFontSize(12);
+doc.setFont("helvetica","normal");
 doc.text("Proposta Comercial",105,30,{align:"center"});
 
-// Linha elegante
 doc.setDrawColor(...azul);
 doc.line(20,38,190,38);
 
-// Especificações
-doc.setFontSize(14);
-doc.setTextColor(...azul);
-doc.text("ESPECIFICAÇÕES DO PROJETO",20,55);
-
-doc.setFontSize(11);
+doc.setFontSize(12);
 doc.setTextColor(0,0,0);
 
-doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,70);
+doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,60);
 
-if(dadosPDF.forro !== "sem"){
-doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,80);
-doc.text(`Tipo de Forro: ${document.getElementById("forro").selectedOptions[0].text}`,20,90);
+if(dadosPDF.forro!=="sem"){
+doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,70);
+doc.text(`Tipo de Forro: ${document.getElementById("forro").selectedOptions[0].text}`,20,80);
 }
 
-doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,105);
+doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,95);
 
-// Linha
-doc.setDrawColor(...azul);
-doc.line(20,115,190,115);
-
-// Valor
-doc.setFont("helvetica","bold");
 doc.setFontSize(16);
 doc.setTextColor(...azul);
-doc.text("VALOR TOTAL DO PROJETO",105,135,{align:"center"});
+doc.text("VALOR TOTAL DO PROJETO",105,120,{align:"center"});
 
-doc.setFontSize(26);
-doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,150,{align:"center"});
-
-doc.setFont("helvetica","normal");
-doc.setFontSize(11);
-doc.setTextColor(0,0,0);
-
-doc.text("Valor referente à confecção, fornecimento de materiais e instalação,",105,165,{align:"center"});
-doc.text("conforme especificações acima.",105,172,{align:"center"});
-
-
-// ================== PÁGINA 2 ==================
+doc.setFontSize(24);
+doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,135,{align:"center"});
 
 doc.addPage();
 
-doc.setFont("helvetica","bold");
-doc.setFontSize(18);
+doc.setFontSize(16);
 doc.setTextColor(...azul);
 doc.text("CONDIÇÕES COMERCIAIS",105,25,{align:"center"});
 
-doc.setFont("helvetica","normal");
 doc.setFontSize(11);
 doc.setTextColor(0,0,0);
 
@@ -326,47 +283,6 @@ doc.text("2. Prazo de confecção: até 15 dias úteis.",20,55);
 doc.text("3. Entrada: 60% | Saldo: 40% na entrega.",20,65);
 doc.text("4. Alterações poderão gerar revisão de valores.",20,75);
 doc.text("5. Produto sob medida não possui troca.",20,85);
-
-// Linha assinatura
-doc.setDrawColor(...azul);
-doc.line(20,120,190,120);
-
-doc.line(20,140,90,140);
-doc.text("Ateliê Patrícia Reis",20,150);
-
-doc.line(120,140,190,140);
-doc.text("Assinatura do Cliente",120,150);
-
-// Rodapé
-doc.setFontSize(9);
-doc.text("Franca – São Paulo",105,280,{align:"center"});
-doc.text("WhatsApp: 16 99428-4571 | Instagram: @ateliepatriciareiss",105,286,{align:"center"});
-
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
-}
-
-doc.text(`Medidas Originais: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,75);
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(15);
-doc.setTextColor(31,60,136);
-doc.text("VALOR TOTAL DO PROJETO",105,100,{align:"center"});
-
-doc.setFontSize(22);
-doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,115,{align:"center"});
-
-doc.addPage();
-
-doc.setFontSize(16);
-doc.setTextColor(31,60,136);
-doc.text("CONDIÇÕES COMERCIAIS",105,25,{align:"center"});
-
-doc.setFontSize(11);
-doc.setTextColor(0,0,0);
-
-doc.text("Produção iniciada após confirmação do pagamento.",20,45);
-doc.text("Prazo médio de confecção: até 15 dias úteis.",20,55);
-doc.text("Produto sob medida não possui troca.",20,65);
 
 doc.line(20,120,90,120);
 doc.text("Ateliê Patrícia Reis",20,130);
