@@ -65,8 +65,10 @@ border-radius:10px;
 margin:6px 0;
 }
 </style>
-</head>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
 <body>
 <div class="container">
 <h1>Ateliê Patrícia Reis</h1>
@@ -107,7 +109,7 @@ margin:6px 0;
 <input type="number" id="extra" value="0">
 
 <button onclick="calcular()">Calcular</button>
-
+<button onclick="gerarPDF()">Gerar PDF</button>
 <div class="result" id="resultado"></div>
 
 </div>
@@ -187,6 +189,140 @@ document.getElementById("resultado").innerHTML=`
 <h2 style="text-align:center;color:#1f3c88;">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
 `;
 }
+ 
+function gerarPDF(){
+    // // ===== INÍCIO DO PDF COMERCIAL PREMIUM =====
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+
+let largura = parseFloat(document.getElementById("largura").value);
+let altura = parseFloat(document.getElementById("altura").value);
+let larguraTecido = parseFloat(document.getElementById("larguraTecido").value);
+let barra = parseFloat(document.getElementById("barra").value)/100;
+let forro = document.getElementById("forro").value;
+let maoSem = parseFloat(document.getElementById("maoSem").value);
+let maoCom = parseFloat(document.getElementById("maoCom").value);
+let extra = parseFloat(document.getElementById("extra").value);
+let entradaPct =  parseFloat(prompt("Percentual de entrada (%)", "60"));
+let prazoDias = prompt("Prazo de produção (dias úteis)", "15");
+
+let cabecalho = 0.12;
+let alturaFinal = altura + barra + cabecalho;
+
+let alturasGaze = Math.ceil((largura*3.5)/larguraTecido);
+let metroGaze = alturasGaze*alturaFinal;
+let valorGaze = metroGaze*26;
+
+let alturasForro = 0;
+let metroForro = 0;
+let valorForro = 0;
+
+if(forro!="sem"){
+alturasForro=Math.ceil((largura*2)/larguraTecido);
+metroForro=alturasForro*alturaFinal;
+
+if(forro=="micro") valorForro=metroForro*13;
+if(forro=="70") valorForro=metroForro*23;
+if(forro=="100") valorForro=metroForro*31;
+}
+
+let valorEntretela=metroGaze*1.60;
+let rodizio=Math.ceil((largura*100)/10);
+if(forro!="sem") rodizio*=2;
+let valorRodizio=rodizio*0.12;
+let valorTrilho=largura*15;
+
+let custoMateriais=valorGaze+valorForro+valorEntretela+valorRodizio+valorTrilho;
+let maoObra=(forro=="sem"?maoSem:maoCom)*largura;
+let valorFinal=custoMateriais+maoObra+extra;
+
+let valorEntrada = (valorFinal*(entradaPct/100));
+let valorEntrega = valorFinal-valorEntrada;
+
+function dinheiro(v){
+return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+// ===== PÁGINA 1 =====
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(18);
+doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
+
+doc.setFontSize(12);
+doc.setFont("helvetica","normal");
+
+let y=35;
+
+doc.text("PROPOSTA COMERCIAL",105,y,{align:"center"});
+y+=15;
+
+doc.text(`Medidas originais: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,y); y+=8;
+doc.text(`Altura final com barra e cabeçalho: ${alturaFinal.toFixed(2)}m`,20,y); y+=8;
+
+doc.text(`Alturas de Gaze: ${alturasGaze}`,20,y); y+=7;
+doc.text(`Metragem total Gaze: ${metroGaze.toFixed(2)}m`,20,y); y+=7;
+
+if(forro!="sem"){
+doc.text(`Alturas de Forro: ${alturasForro}`,20,y); y+=7;
+doc.text(`Metragem total Forro: ${metroForro.toFixed(2)}m`,20,y); y+=7;
+}
+
+y+=5;
+
+doc.setDrawColor(180);
+doc.line(20,y,190,y);
+y+=10;
+
+doc.setFont("helvetica","bold");
+doc.text("Condições Comerciais",20,y);
+doc.setFont("helvetica","normal");
+y+=8;
+
+doc.text(`Prazo estimado: até ${prazoDias} dias úteis após confirmação da entrada.`,20,y,{maxWidth:170}); y+=8;
+doc.text(`Entrada: ${entradaPct}% (${dinheiro(valorEntrada)})`,20,y); y+=7;
+doc.text(`Saldo na entrega: ${dinheiro(valorEntrega)}`,20,y); y+=12;
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(14);
+doc.text("VALOR TOTAL DO PROJETO",105,y,{align:"center"});
+y+=10;
+
+doc.setFontSize(20);
+doc.text(dinheiro(valorFinal),105,y,{align:"center"});
+
+// ===== NOVA PÁGINA =====
+doc.addPage();
+
+doc.setFontSize(16);
+doc.setFont("helvetica","bold");
+doc.text("CONDIÇÕES CONTRATUAIS",105,20,{align:"center"});
+
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+
+let y2=35;
+
+doc.text("1. A produção será iniciada após confirmação do pagamento da entrada.",20,y2,{maxWidth:170}); y2+=8;
+doc.text("2. O prazo poderá sofrer alteração em caso de mudanças solicitadas pelo cliente.",20,y2,{maxWidth:170}); y2+=8;
+doc.text("3. Alterações após início da produção poderão gerar custos adicionais.",20,y2,{maxWidth:170}); y2+=8;
+doc.text("4. Produto confeccionado sob medida não possui troca.",20,y2,{maxWidth:170}); y2+=15;
+
+doc.text("Declaro estar de acordo com as especificações, valores e condições descritas.",20,y2,{maxWidth:170}); y2+=20;
+
+doc.line(20,y2,90,y2);
+doc.line(120,y2,190,y2);
+y2+=8;
+
+doc.text("Ateliê Patrícia Reis",30,y2);
+doc.text("Assinatura do Cliente",130,y2);
+
+doc.save("Proposta_Comercial_Atelie_Patricia_Reis.pdf");
+
+// ===== FIM DO PDF =====
+}
+
 </script>
 
 </body>
