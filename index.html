@@ -131,10 +131,6 @@ margin:15px 0;
 
 <script>
 
-let ultimoVa
-
-  <script>
-
 let ultimoValorFinal = 0;
 let dadosPDF = {};
 
@@ -166,14 +162,12 @@ return;
 let cabecalho = 0.12;
 let alturaFinal = altura + barra + cabecalho;
 
-/* ---------------- GAZE ---------------- */
-
+/* GAZE */
 let alturasGaze = Math.ceil((largura * 3.5) / larguraTecido);
 let metroGaze = alturasGaze * alturaFinal;
 let valorGaze = metroGaze * 26;
 
-/* ---------------- FORRO ---------------- */
-
+/* FORRO */
 let alturasForro = 0;
 let metroForro = 0;
 let valorForro = 0;
@@ -187,8 +181,7 @@ if(forro === "70") valorForro = metroForro * 23;
 if(forro === "100") valorForro = metroForro * 31;
 }
 
-/* ---------------- ACESSÓRIOS ---------------- */
-
+/* ACESSÓRIOS */
 let valorEntretela = metroGaze * 1.60;
 
 let rodizio = Math.ceil((largura * 100) / 10);
@@ -198,8 +191,7 @@ let valorRodizio = rodizio * 0.12;
 let valorPresilha = presilhas * 1.60;
 let valorTrilho = largura * 15;
 
-/* ---------------- TOTAIS ---------------- */
-
+/* TOTAIS */
 let custoMateriais = valorGaze + valorForro + valorEntretela + valorRodizio + valorPresilha + valorTrilho;
 let maoObra = (forro === "sem" ? maoSem : maoCom) * largura;
 let valorFinal = custoMateriais + maoObra + instalacao + extra;
@@ -216,7 +208,6 @@ valorFinal
 };
 
 document.getElementById("resultado").innerHTML = `
-
 <h3>DETALHAMENTO TÉCNICO</h3>
 
 <p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
@@ -317,3 +308,5 @@ doc.save("Proposta_Atelie_Patricia_Reis.pdf");
 }
 
 </script>
+</body>
+</html>
