@@ -65,10 +65,8 @@ border-radius:10px;
 margin:6px 0;
 }
 </style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
+
 <body>
 <div class="container">
 <h1>Ateliê Patrícia Reis</h1>
@@ -84,20 +82,7 @@ margin:6px 0;
 
 <label>Barra (cm)</label>
 <input type="number" id="barra" value="30">
-<label>Modelo da Cortina</label>
-<select id="modeloCortina">
-<option value="macho">Prega Macho</option>
-<option value="wave">Prega Wave</option>
-<option value="americana">Prega Americana</option>
-<option value="franzido">Franzido</option>
-<option value="ilhos">Ilhós</option>
-</select>
 
-<label>Modelo do Forro</label>
-<select id="modeloForro">
-<option value="painel">Painel</option>
-<option value="franzido">Franzido</option>
-</select>
 <label>Tipo de Forro</label>
 <select id="forro">
 <option value="sem">Sem Forro</option>
@@ -122,7 +107,7 @@ margin:6px 0;
 <input type="number" id="extra" value="0">
 
 <button onclick="calcular()">Calcular</button>
-<button onclick="gerarPDF()">Gerar PDF</button>
+
 <div class="result" id="resultado"></div>
 
 </div>
@@ -132,7 +117,6 @@ function calcular(){
 
 let largura=parseFloat(document.getElementById("largura").value);
 let altura=parseFloat(document.getElementById("altura").value);
- let modeloCortina=document.getElementById("modeloCortina").value;
 let larguraTecido=parseFloat(document.getElementById("larguraTecido").value);
 let barra=parseFloat(document.getElementById("barra").value)/100;
 let forro=document.getElementById("forro").value;
@@ -146,16 +130,7 @@ let cabecalho=0.12;
 
 let alturaFinal=altura+barra+cabecalho;
 
-let fatorCortina=3.5;
-
-if(modeloCortina=="wave") fatorCortina=2.2;
-if(modeloCortina=="franzido") fatorCortina=2.5;
-if(modeloCortina=="ilhos") fatorCortina=2.0;
-if(modeloCortina=="americana") fatorCortina=3.0;
-if(modeloCortina=="macho") fatorCortina=3.5;
-
-
-let alturasGaze = Math.ceil((largura * fatorCortina) / larguraTecido);
+let alturasGaze=Math.ceil((largura*3.5)/larguraTecido);
 let metroGaze=alturasGaze*alturaFinal;
 
 let valorGaze=metroGaze*26;
@@ -165,11 +140,7 @@ let metroForro=0;
 let valorForro=0;
 
 if(forro!="sem"){
-let fatorForro=2;
-
-if(modeloForro=="franzido") fatorForro=2.5;
-
-alturasForro=Math.ceil((largura*fatorForro)/larguraTecido);
+alturasForro=Math.ceil((largura*2)/larguraTecido);
 metroForro=alturasForro*alturaFinal;
 
 if(forro=="micro") valorForro=metroForro*13;
@@ -216,105 +187,6 @@ document.getElementById("resultado").innerHTML=`
 <h2 style="text-align:center;color:#1f3c88;">VALOR FINAL: R$ ${valorFinal.toFixed(2)}</h2>
 `;
 }
- 
-function gerarPDF(){
-function gerarPDF(){
-
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-
-let largura = parseFloat(document.getElementById("largura").value);
-let altura = parseFloat(document.getElementById("altura").value);
-let forro = document.getElementById("forro").value;
-let modeloCortina=document.getElementById("modeloCortina").value;
-let modeloForro=document.getElementById("modeloForro").value;
-let extra = parseFloat(document.getElementById("extra").value) || 0;
-let instalacao = parseFloat(document.getElementById("instalacao").value) || 0;
-let maoSem = parseFloat(document.getElementById("maoSem").value) || 0;
-let maoCom = parseFloat(document.getElementById("maoCom").value) || 0;
-
-/* IMPORTANTE:
-Aqui estamos reaproveitando o valorFinal já calculado na tela.
-Se ele não existir, força cálculo antes.
-*/
-
-calcular();
-
-let resultadoTexto = document.getElementById("resultado").innerText;
-let valorLinha = resultadoTexto.split("VALOR FINAL: R$ ")[1];
-let valorFinal = parseFloat(valorLinha.replace(",", "."));
-
-let entradaPercentual = 60;
-let entrada = valorFinal * (entradaPercentual/100);
-let saldo = valorFinal - entrada;
-
-/* ===== PÁGINA 1 ===== */
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(20);
-doc.setTextColor("#1f3c88");
-doc.text("ATELIÊ PATRÍCIA REIS",105,25,{align:"center"});
-
-doc.setFontSize(14);
-doc.text("PROPOSTA COMERCIAL",105,35,{align:"center"});
-
-doc.setTextColor("#000000");
-doc.setFont("helvetica","normal");
-doc.setFontSize(12);
-
-doc.text(`Medidas originais: ${largura.toFixed(2)}m (L) x ${altura.toFixed(2)}m (A)`,20,55);
-
-doc.line(20,65,190,65);
-
-doc.setFont("helvetica","bold");
-doc.text("Condições Comerciais",20,80);
-
-doc.setFont("helvetica","normal");
-doc.text("Prazo estimado: até 15 dias úteis após confirmação da entrada.",20,90);
-
-doc.text(`Entrada: ${entradaPercentual}% (R$ ${entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})})`,20,100);
-
-doc.text(`Saldo na entrega: R$ ${saldo.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,20,110);
-
-doc.line(20,125,190,125);
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(14);
-doc.text("VALOR TOTAL DO PROJETO",105,145,{align:"center"});
-
-doc.setFontSize(22);
-doc.setTextColor("#1f3c88");
-doc.text(`R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,160,{align:"center"});
-
-/* ===== PÁGINA 2 ===== */
-
-doc.addPage();
-
-doc.setFont("helvetica","bold");
-doc.setFontSize(16);
-doc.setTextColor("#1f3c88");
-doc.text("CONDIÇÕES CONTRATUAIS",105,30,{align:"center"});
-
-doc.setTextColor("#000000");
-doc.setFont("helvetica","normal");
-doc.setFontSize(12);
-
-doc.text("1. A produção será iniciada após confirmação do pagamento da entrada.",20,50);
-doc.text("2. O prazo poderá sofrer alteração em caso de mudanças solicitadas pelo cliente.",20,60);
-doc.text("3. Alterações após início da produção poderão gerar custos adicionais.",20,70);
-doc.text("4. Produto confeccionado sob medida não possui troca.",20,80);
-
-doc.text("Declaro estar de acordo com as especificações, valores e condições descritas.",20,100);
-
-doc.line(20,140,90,140);
-doc.text("Ateliê Patrícia Reis",20,150);
-
-doc.line(120,140,190,140);
-doc.text("Assinatura do Cliente",120,150);
-
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
-}
-
 </script>
 
 </body>
