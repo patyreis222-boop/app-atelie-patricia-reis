@@ -205,82 +205,35 @@ document.getElementById("resultado").innerHTML=`
 <hr>
 
 <p><strong>Altura Final:</strong> ${alturaFinal.toFixed(2)} m</p>
-<p><strong>Alturas Gaze:</strong> ${alturasGaze}</p>
-<p><strong>Metragem Gaze:</strong> ${metroGaze.toFixed(2)} m</p>
 
 <hr>
 
-<p><strong>Alturas Forro:</strong> ${alturasForro}</p>
-<p><strong>Metragem Forro:</strong> ${metroForro.toFixed(2)} m</p>
+<p><strong>Gaze:</strong> ${metroGaze.toFixed(2)} m → R$ ${valorGaze.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Forro:</strong> ${metroForro.toFixed(2)} m → R$ ${valorForro.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Entretela:</strong> ${metroGaze.toFixed(2)} m → R$ ${valorEntretela.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Rodízio:</strong> ${rodizio} un → R$ ${valorRodizio.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Presilhas:</strong> ${presilhas} un → R$ ${valorPresilha.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Trilho:</strong> ${largura.toFixed(2)} m → R$ ${valorTrilho.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
 
 <hr>
 
-<p><strong>Custo Materiais:</strong> R$ ${custoMateriais.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+<p><strong>Custo Total Materiais:</strong> R$ ${custoMateriais.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
 <p><strong>Mão de Obra:</strong> R$ ${maoObra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Instalação:</strong> R$ ${instalacao.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<p><strong>Valor Adicional:</strong> R$ ${extra.toLocaleString("pt-BR",{minimumFractionDigits:2})}</p>
+
+<hr>
 
 <h2 style="text-align:center;color:#1f3c88;">
 VALOR FINAL: R$ ${valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}
 </h2>
 `;
 }
-
-function gerarPDF(){
-
-if(!ultimoValorFinal){
-alert("Calcule primeiro.");
-return;
-}
-
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-
-doc.setFontSize(18);
-doc.setTextColor("#1f3c88");
-doc.text("ATELIÊ PATRÍCIA REIS",105,20,{align:"center"});
-
-doc.setFontSize(13);
-doc.text("PROPOSTA COMERCIAL",105,30,{align:"center"});
-
-doc.setTextColor("#000");
-doc.setFontSize(12);
-
-doc.text(`Modelo da Cortina: ${dadosPDF.modeloCortina}`,20,50);
-
-if(dadosPDF.forro!="sem"){
-doc.text(`Modelo do Forro: ${dadosPDF.modeloForro}`,20,60);
-}
-
-doc.text(`Medidas: ${dadosPDF.largura.toFixed(2)}m (L) x ${dadosPDF.altura.toFixed(2)}m (A)`,20,75);
-
-doc.setFontSize(16);
-doc.setTextColor("#1f3c88");
-doc.text("VALOR TOTAL DO PROJETO",105,100,{align:"center"});
-
-doc.setFontSize(20);
-doc.text(`R$ ${dadosPDF.valorFinal.toLocaleString("pt-BR",{minimumFractionDigits:2})}`,105,115,{align:"center"});
-
-doc.addPage();
-
-doc.setFontSize(16);
-doc.setTextColor("#1f3c88");
-doc.text("CONDIÇÕES CONTRATUAIS",105,25,{align:"center"});
-
-doc.setFontSize(11);
-doc.setTextColor("#000");
-
-doc.text("Produção iniciada após confirmação do pagamento.",20,45);
-doc.text("Alterações poderão gerar custos adicionais.",20,55);
-doc.text("Produto sob medida não possui troca.",20,65);
-
-doc.line(20,120,90,120);
-doc.text("Ateliê Patrícia Reis",20,130);
-
-doc.line(120,120,190,120);
-doc.text("Assinatura do Cliente",120,130);
-
-doc.save("Proposta_Atelie_Patricia_Reis.pdf");
-}
-
-</script>
-</body>
-</html>
